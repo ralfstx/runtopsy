@@ -15,3 +15,7 @@ body {
   height: 350px;
   opacity: 0;
 }
+
+#info {
+  font-size: 14px;
+}

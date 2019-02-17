@@ -86,8 +86,16 @@ function renderActivity(activity) {
   let start = moment(activity.start).format('H:mm');
   let end = moment(activity.end).format('H:mm');
   let distance = activity.distance.toPrecision(2) + ' km';
-  document.getElementById('details-title').innerHTML = `<h3>${date} &nbsp; ${start} – ${end} &nbsp; ${activity.type}  &nbsp; ${distance}</h3>`;
-  let time = humanizeDuration(activity.movingTime * 1000, { units: ['d', 'h', 'm'], round: true });
-  let message = `Moving time: ${time} &nbsp; Average pace: ${(60 / activity.avgSpeed).toPrecision(2)}`;
+  let title = `${date} &nbsp; ${start} – ${end} &nbsp; ${activity.type}  &nbsp; ${distance}`;
+  document.getElementById('details-title').innerHTML = `<h3>${title}</h3>`;
+  let movTime = humanizeDuration(activity.movingTime * 1000, { units: ['d', 'h', 'm'], round: true });
+  let avgPace = formatPace(60 / activity.avgSpeed);
+  let message = `Moving time: ${movTime} &nbsp; Average pace: ${avgPace}`;
   document.getElementById('info').innerHTML = message;
+}
+
+function formatPace(pace) {
+  let minutes = Math.trunc(pace);
+  let seconds = Math.round(pace % 1 * 60);
+  return minutes + ':' + (seconds < 10 ? '0' + seconds : seconds);
 }
