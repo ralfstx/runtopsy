@@ -1,0 +1,17 @@
+body {
+  padding: 0;
+  margin: 20px;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  background-color: #fff;
+}
+
+.fc-event {
+    font-size: 1em;
+}
+
+#map {
+  height: 350px;
+  opacity: 0;
+}

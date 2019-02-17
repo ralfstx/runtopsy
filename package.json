@@ -1,0 +1,23 @@
+{
+  "name": "running-calendar",
+  "version": "0.1.0",
+  "description": "A running calendar",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "dependencies": {
+    "easy-fit": "0.0.8",
+    "fs-extra": "^7.0.1",
+    "fullcalendar": "^3.10.0",
+    "humanize-duration": "^3.17.0",
+    "jquery": "^3.3.1",
+    "leaflet": "^1.4.0",
+    "moment": "^2.24.0",
+    "typeface-open-sans": "0.0.54"
+  },
+  "devDependencies": {
+    "eslint": "^5.14.0",
+    "electron": "^4.0.1"
+  }
+}
