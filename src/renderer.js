@@ -87,7 +87,7 @@ function renderMonths() {
     data.push(firstDisplayMonth.plus({months: i}));
   }
   let selection = svg.selectAll('.month')
-    .data(data, d => d.toFormat('yyyy-MM'));
+    .data(data, d => d.toFormat('yyyy-LL'));
   // exiting
   selection.exit()
     .remove();
@@ -100,15 +100,25 @@ function renderMonths() {
     .append('g')
     .attr('class', 'month')
     .attr('transform', d => `translate(0,${getY(d)})`);
-  entering.append('line')
-    .attr('x1', 5)
-    .attr('x2', d => 14 + getDays(d) * 22)
-    .attr('y1', 0)
-    .attr('y2', 0);
   entering.append('text')
-    .attr('x', 10)
-    .attr('y', -18)
+    .attr('x', 5)
+    .attr('y', -16)
     .text(d => d.toFormat('LLLL yyyy'));
+  entering.each(function(d) {
+    let group = d3.select(this);
+    let firstDay = d.startOf('month');
+    let lastDayOfMonth = d.endOf('month');
+    while (firstDay.month == d.month) {
+      let lastDay = firstDay.endOf('week');
+      if (lastDay > lastDayOfMonth) lastDay = lastDayOfMonth;
+      group.append('line')
+        .attr('x1', getX(firstDay) - 7)
+        .attr('x2', getX(lastDay) + 7)
+        .attr('y1', 0)
+        .attr('y2', 0);
+      firstDay = lastDay.plus({days: 1});
+    }
+  });
 }
 
 function renderActivities(data) {
@@ -124,20 +134,14 @@ function renderActivities(data) {
   selection.enter()
     .append('circle')
     .attr('class', 'activity')
-    .attr('r', 10)
+    .attr('r', 7)
     .attr('cx', d => getX(d.date))
     .attr('cy', d => getY(d.date))
     .on('click', d => showActivity(d.id));
 }
 
-function getDays(dateTime) {
-  let lastDay = dateTime.endOf('month');
-  let days = lastDay.day;
-  return days;
-}
-
 function getX(dateTime) {
-  return 20 + (dateTime.day - 1) * 22;
+  return 10 + (dateTime.day - 1) * 22;
 }
 
 function getY(dateTime) {
@@ -195,7 +199,7 @@ function showActivity(activity) {
   document.getElementById('value-mov-time').innerText = movTime;
   svg.selectAll('.activity')
     .classed('selected', d => d.id === activity.id)
-    .attr('r', d => d.id === activity.id ? 11 : 10);
+    .attr('r', d => d.id === activity.id ? 8 : 7);
 }
 
 function formatPace(pace) {

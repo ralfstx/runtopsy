@@ -15,8 +15,8 @@ body {
   fill: #555;
 }
 #calendar .month line {
-  stroke: #55aa77;
-  stroke-width: 2px;
+  stroke: #ccc;
+  stroke-width: 4px;
   cursor: pointer;
 }
 #calendar circle.activity {
