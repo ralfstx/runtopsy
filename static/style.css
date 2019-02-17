@@ -7,8 +7,25 @@ body {
   background-color: #fff;
 }
 
-.fc-event {
-  font-size: 1em;
+#calendar {
+  height: 280px;
+}
+
+#calendar .month text {
+  fill: #555;
+}
+#calendar .month line {
+  stroke: #55aa77;
+  stroke-width: 2px;
+  cursor: pointer;
+}
+#calendar circle.activity {
+  fill: #55aa77;
+  cursor: pointer;
+}
+#calendar circle.activity.selected {
+  fill: #ff5555;
+  cursor: pointer;
 }
 
 #details {

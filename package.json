@@ -7,13 +7,12 @@
     "start": "electron ."
   },
   "dependencies": {
+    "d3": "^5.9.1",
     "easy-fit": "0.0.8",
     "fs-extra": "^7.0.1",
-    "fullcalendar": "^3.10.0",
     "humanize-duration": "^3.17.0",
-    "jquery": "^3.3.1",
     "leaflet": "^1.4.0",
-    "moment": "^2.24.0",
+    "luxon": "^1.11.2",
     "typeface-open-sans": "0.0.54"
   },
   "devDependencies": {

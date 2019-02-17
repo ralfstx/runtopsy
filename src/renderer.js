@@ -1,16 +1,19 @@
-/* global $ L */
+/* global L d3 */
 // @ts-ignore
 const ipc = window.ipc;
 // @ts-ignore
-const moment = window.moment;
-// @ts-ignore
 const humanizeDuration = window.humanizeDuration;
+// @ts-ignore
+const { DateTime, Interval } = window.luxon;
 
 let activities = {};
 let currentActivity = null;
 let map = null;
 let mapTileLayer = null;
 let currentLayer = null;
+let svg = null;
+let firstDisplayMonth;
+let nrDisplayMonth;
 
 initUi();
 initIpc();
@@ -38,15 +41,10 @@ function initIpc() {
 }
 
 function initCalendar() {
-  $('#calendar').fullCalendar({
-    defaultView: 'month',
-    firstDay: 1,
-    displayEventTime: false,
-    timeFormat: 'H:mm',
-    height: 345,
-    events: (start, end, timezone, callback) => callback(getEvents()),
-    eventClick: (event) => showActivity(activities[event.activity])
-  });
+  svg = d3.select('#calendar')
+    .append('svg:svg')
+    .attr('width', '100%')
+    .attr('height', '100%');
 }
 
 function initMap() {
@@ -69,24 +67,84 @@ function initMapTileLayer(accessToken) {
 
 async function updateActivity(activity) {
   activities[activity.id] = activity;
-  $('#calendar').fullCalendar('refetchEvents');
+  let orderedIds = getOrderedActivityIds();
+  let activityData = orderedIds.map(id => {
+    let activity = activities[id];
+    let distance = activity.distance.toPrecision(2) + ' km';
+    let date = DateTime.fromISO(activity.start);
+    return {id, distance, date};
+  });
+  let lastActivity = activityData[activityData.length - 1];
+  nrDisplayMonth = 5;
+  firstDisplayMonth = lastActivity.date.startOf('month').minus({months: nrDisplayMonth - 1});
+  renderMonths();
+  renderActivities(activityData);
 }
 
-function getEvents() {
-  let events = [];
-  for (const id in activities) {
-    let activity = activities[id];
-    events.push({
-      title: `${activity.distance.toPrecision(2)} km`,
-      start: activity.start,
-      end: activity.end,
-      color: activity.type === 'running' ? '#CC0033' : activity.type === 'walking' ? '#004E00' : '#7F8C8D',
-      textColor: 'white',
-      activity: activity.id
-    });
+function renderMonths() {
+  let data = [];
+  for (let i = 0; i < nrDisplayMonth; i++) {
+    data.push(firstDisplayMonth.plus({months: i}));
   }
-  return events;
+  let selection = svg.selectAll('.month')
+    .data(data, d => d.toFormat('yyyy-MM'));
+  // exiting
+  selection.exit()
+    .remove();
+  // updating
+  selection
+    .transition().duration(500)
+    .attr('transform', d => `translate(0,${getY(d)})`);
+  // entering
+  let entering = selection.enter()
+    .append('g')
+    .attr('class', 'month')
+    .attr('transform', d => `translate(0,${getY(d)})`);
+  entering.append('line')
+    .attr('x1', 5)
+    .attr('x2', d => 14 + getDays(d) * 22)
+    .attr('y1', 0)
+    .attr('y2', 0);
+  entering.append('text')
+    .attr('x', 10)
+    .attr('y', -18)
+    .text(d => d.toFormat('LLLL yyyy'));
 }
+
+function renderActivities(data) {
+  let selection = svg.selectAll('.activity').data(data, d => d.id);
+  // exiting
+  selection.exit()
+    .remove();
+  // updating
+  selection
+    .transition().duration(500)
+    .attr('cy', d => getY(d.date));
+  // entering
+  selection.enter()
+    .append('circle')
+    .attr('class', 'activity')
+    .attr('r', 10)
+    .attr('cx', d => getX(d.date))
+    .attr('cy', d => getY(d.date))
+    .on('click', d => showActivity(d.id));
+}
+
+function getDays(dateTime) {
+  let lastDay = dateTime.endOf('month');
+  let days = lastDay.day;
+  return days;
+}
+
+function getX(dateTime) {
+  return 20 + (dateTime.day - 1) * 22;
+}
+
+function getY(dateTime) {
+  let diff = Interval.fromDateTimes(firstDisplayMonth, dateTime.startOf('month')).length('months');
+  return 40 + diff * 50;
+}
+
 
 function getNextActivity() {
   if (!currentActivity) return;
@@ -111,8 +169,8 @@ function getOrderedActivityIds() {
 }
 
 function showActivity(activity) {
-  console.log('show', activity);
   if (!activity) return;
+  if (typeof activity === 'string') activity = activities[activity];
   if (currentActivity === activity) return;
   currentActivity = activity;
   let allPoints = activity.records
@@ -124,9 +182,9 @@ function showActivity(activity) {
   polyline.addTo(map);
   currentLayer = polyline;
   document.getElementById('details').style.opacity = '1';
-  let date = moment(activity.start).format('dddd, MMM D, YYYY');
-  let start = moment(activity.start).format('H:mm');
-  let end = moment(activity.end).format('H:mm');
+  let date = DateTime.fromISO(activity.start).toFormat('cccc, LLLL d, yyyy');
+  let start = DateTime.fromISO(activity.start).toFormat('H:mm');
+  let end = DateTime.fromISO(activity.end).toFormat('H:mm');
   let distance = activity.distance.toPrecision(2) + ' km';
   let title = `${date} &nbsp; ${start} – ${end}`;
   document.getElementById('details-title').innerHTML = `<h3>${title}</h3>`;
@@ -135,6 +193,9 @@ function showActivity(activity) {
   document.getElementById('value-distance').innerText = distance;
   document.getElementById('value-avg-pace').innerText = avgPace;
   document.getElementById('value-mov-time').innerText = movTime;
+  svg.selectAll('.activity')
+    .classed('selected', d => d.id === activity.id)
+    .attr('r', d => d.id === activity.id ? 11 : 10);
 }
 
 function formatPace(pace) {
