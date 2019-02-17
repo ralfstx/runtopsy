@@ -8,14 +8,32 @@ body {
 }
 
 .fc-event {
-    font-size: 1em;
+  font-size: 1em;
+}
+
+#details {
+  opacity: 0;
+  font-size: 14px;
 }
 
 #map {
   height: 350px;
-  opacity: 0;
 }
 
-#info {
+#info table {
+  width: 600px;
+  margin-top: 4px;
+  margin-left: auto;
+  margin-right: auto;
+}
+#info th {
   font-size: 14px;
+  font-weight: normal;
+}
+#info td {
+  width: 200px;
+  margin-top: 8px;
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
 }

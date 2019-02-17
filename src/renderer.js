@@ -36,7 +36,7 @@ function initCalendar() {
     firstDay: 1,
     displayEventTime: false,
     timeFormat: 'H:mm',
-    height: 350,
+    height: 345,
     events: (start, end, timezone, callback) => callback(getEvents()),
     eventClick: (event) => renderActivity(activities[event.activity])
   });
@@ -89,17 +89,18 @@ function renderActivity(activity) {
   currentLayer && currentLayer.removeFrom(map);
   polyline.addTo(map);
   currentLayer = polyline;
-  document.getElementById('map').style.opacity = '1';
+  document.getElementById('details').style.opacity = '1';
   let date = moment(activity.start).format('dddd, MMM D, YYYY');
   let start = moment(activity.start).format('H:mm');
   let end = moment(activity.end).format('H:mm');
   let distance = activity.distance.toPrecision(2) + ' km';
-  let title = `${date} &nbsp; ${start} – ${end} &nbsp; ${activity.type}  &nbsp; ${distance}`;
+  let title = `${date} &nbsp; ${start} – ${end}`;
   document.getElementById('details-title').innerHTML = `<h3>${title}</h3>`;
-  let movTime = humanizeDuration(activity.movingTime * 1000, { units: ['d', 'h', 'm'], round: true });
   let avgPace = formatPace(60 / activity.avgSpeed);
-  let message = `Moving time: ${movTime} &nbsp; Average pace: ${avgPace}`;
-  document.getElementById('info').innerHTML = message;
+  let movTime = humanizeDuration(activity.movingTime * 1000, { units: ['d', 'h', 'm'], round: true });
+  document.getElementById('value-distance').innerText = distance;
+  document.getElementById('value-avg-pace').innerText = avgPace;
+  document.getElementById('value-mov-time').innerText = movTime;
 }
 
 function formatPace(pace) {
