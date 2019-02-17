@@ -7,7 +7,6 @@ const moment = window.moment;
 const humanizeDuration = window.humanizeDuration;
 
 let activities = {};
-let events = [];
 let map = null;
 let mapTileLayer = null;
 let currentLayer = null;
@@ -38,7 +37,7 @@ function initCalendar() {
     displayEventTime: false,
     timeFormat: 'H:mm',
     height: 350,
-    events: (start, end, timezone, callback) => callback(events),
+    events: (start, end, timezone, callback) => callback(getEvents()),
     eventClick: (event) => renderActivity(activities[event.activity])
   });
 }
@@ -62,15 +61,23 @@ function initMapTileLayer(accessToken) {
 
 async function updateActivity(activity) {
   activities[activity.id] = activity;
-  events.push({
-    title: `${activity.distance.toPrecision(2)} km`,
-    start: activity.start,
-    end: activity.end,
-    color: activity.type === 'running' ? '#CC0033' : activity.type === 'walking' ? '#004E00' : '#7F8C8D',
-    textColor: 'white',
-    activity: activity.id
-  });
   $('#calendar').fullCalendar('refetchEvents');
+}
+
+function getEvents() {
+  let events = [];
+  for (const id in activities) {
+    let activity = activities[id];
+    events.push({
+      title: `${activity.distance.toPrecision(2)} km`,
+      start: activity.start,
+      end: activity.end,
+      color: activity.type === 'running' ? '#CC0033' : activity.type === 'walking' ? '#004E00' : '#7F8C8D',
+      textColor: 'white',
+      activity: activity.id
+    });
+  }
+  return events;
 }
 
 function renderActivity(activity) {
