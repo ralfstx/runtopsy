@@ -54,8 +54,7 @@ function initMap() {
 function initMapTileLayer(accessToken) {
   mapTileLayer && mapTileLayer.removeFrom(map);
   mapTileLayer = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
-    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors,'
-      + ' <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>,'
+    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>,'
       + ' Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
     maxZoom: 18,
     // @ts-ignore incomplete typings
