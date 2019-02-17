@@ -27,11 +27,15 @@ function createWindow () {
     title: 'Runtopsy',
     autoHideMenuBar: true,
     icon: join(__dirname, '../icons/512x512.png'),
-    webPreferences: { nodeIntegration: true }
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: false,
+      preload: join(__dirname, 'preload.js')
+    }
   });
   mainWindow.loadFile('static/index.html');
   mainWindow.on('closed', () => mainWindow = null);
-  // mainWindow.webContents.openDevTools();
+  //mainWindow.webContents.openDevTools();
   // open links in external browser
   mainWindow.webContents.on('will-navigate', (event, url) => {
     event.preventDefault();

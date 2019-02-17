@@ -1,9 +1,10 @@
-const { ipcRenderer } = require('electron');
-const moment = require('moment');
-const humanizeDuration = require('humanize-duration');
-const L = require('leaflet');
-const $ = require('jquery');
-require('fullcalendar');
+/* global $ L */
+// @ts-ignore
+const ipc = window.ipc;
+// @ts-ignore
+const moment = window.moment;
+// @ts-ignore
+const humanizeDuration = window.humanizeDuration;
 
 let activities = {};
 let events = [];
@@ -20,14 +21,14 @@ function initUi() {
 }
 
 function initIpc() {
-  ipcRenderer.on('activity', (event, activity) => {
+  ipc.on('activity', (event, activity) => {
     updateActivity(activity);
   });
-  ipcRenderer.on('config', (event, config) => {
+  ipc.on('config', (event, config) => {
     initMapTileLayer(config.mapboxAccessToken);
   });
-  ipcRenderer.send('get-config');
-  ipcRenderer.send('get-activities');
+  ipc.send('get-config');
+  ipc.send('get-activities');
 }
 
 function initCalendar() {
