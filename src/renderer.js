@@ -61,7 +61,8 @@ function initMapTileLayer(accessToken) {
       + ' Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
     maxZoom: 18,
     // @ts-ignore incomplete typings
-    id: 'mapbox.streets',
+    // alternative: 'mapbox.streets'
+    id: 'mapbox.outdoors',
     accessToken
   }).addTo(map);
 }
