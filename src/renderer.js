@@ -7,6 +7,7 @@ const moment = window.moment;
 const humanizeDuration = window.humanizeDuration;
 
 let activities = {};
+let currentActivity = null;
 let map = null;
 let mapTileLayer = null;
 let currentLayer = null;
@@ -20,11 +21,17 @@ function initUi() {
 }
 
 function initIpc() {
+  ipc.on('config', (event, config) => {
+    initMapTileLayer(config.mapboxAccessToken);
+  });
   ipc.on('activity', (event, activity) => {
     updateActivity(activity);
   });
-  ipc.on('config', (event, config) => {
-    initMapTileLayer(config.mapboxAccessToken);
+  ipc.on('goto-next-activity', () => {
+    showActivity(getNextActivity());
+  });
+  ipc.on('goto-prev-activity', () => {
+    showActivity(getPrevActivity());
   });
   ipc.send('get-config');
   ipc.send('get-activities');
@@ -38,7 +45,7 @@ function initCalendar() {
     timeFormat: 'H:mm',
     height: 345,
     events: (start, end, timezone, callback) => callback(getEvents()),
-    eventClick: (event) => renderActivity(activities[event.activity])
+    eventClick: (event) => showActivity(activities[event.activity])
   });
 }
 
@@ -80,7 +87,33 @@ function getEvents() {
   return events;
 }
 
-function renderActivity(activity) {
+function getNextActivity() {
+  if (!currentActivity) return;
+  let orderedIds = getOrderedActivityIds();
+  let currentIndex = orderedIds.indexOf(currentActivity.id);
+  if (currentIndex !== -1 && currentIndex <= orderedIds.length) {
+    return activities[orderedIds[currentIndex + 1]];
+  }
+}
+
+function getPrevActivity() {
+  if (!currentActivity) return;
+  let orderedIds = getOrderedActivityIds();
+  let currentIndex = orderedIds.indexOf(currentActivity.id);
+  if (currentIndex !== -1 && currentIndex > 0) {
+    return activities[orderedIds[currentIndex - 1]];
+  }
+}
+
+function getOrderedActivityIds() {
+  return Object.keys(activities).sort((a, b) => parseInt(a) - parseInt(b));
+}
+
+function showActivity(activity) {
+  console.log('show', activity);
+  if (!activity) return;
+  if (currentActivity === activity) return;
+  currentActivity = activity;
   let allPoints = activity.records
     .map(record => record.position)
     .filter(point => point != null);

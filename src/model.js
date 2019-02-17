@@ -83,7 +83,7 @@ function extractActivity(session) {
     .reduce((a, b) => a.concat(b), [])
     .map(record => extractRecord(record));
   let activity = {
-    id: Date.parse(session.start_time),
+    id: Date.parse(session.start_time).toString(),
     type: session.sport,
     start: session.start_time,
     end: session.timestamp,

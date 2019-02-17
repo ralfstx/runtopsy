@@ -1,4 +1,4 @@
-const { Menu } = require('electron');
+const { BrowserWindow, Menu } = require('electron');
 const { importFiles } = require('./model');
 
 exports.createMenu = createMenu;
@@ -31,6 +31,21 @@ const menuTemplate = [
     ]
   },
   {
+    label: 'Navigate',
+    submenu: [
+      {
+        label: 'Next Activity',
+        accelerator: 'Right',
+        click: gotoNextActivitiy
+      },
+      {
+        label: 'Previous Activity',
+        accelerator: 'Left',
+        click: gotoPrevActivitiy
+      }
+    ]
+  },
+  {
     role: 'window',
     submenu: [
       { role: 'minimize' },
@@ -41,4 +56,12 @@ const menuTemplate = [
 
 function createMenu() {
   Menu.setApplicationMenu(Menu.buildFromTemplate(menuTemplate));
+}
+
+function gotoNextActivitiy() {
+  BrowserWindow.getAllWindows().forEach(win => win.webContents.send('goto-next-activity'));
+}
+
+function gotoPrevActivitiy() {
+  BrowserWindow.getAllWindows().forEach(win => win.webContents.send('goto-prev-activity'));
 }
