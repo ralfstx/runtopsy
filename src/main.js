@@ -24,8 +24,9 @@ app.on('activate', () => {
 function createWindow () {
   mainWindow = new BrowserWindow({
     width: 850, height: 850,
+    title: 'Runtopsy',
     autoHideMenuBar: true,
-    icon: join(__dirname, 'icons/512x512.png'),
+    icon: join(__dirname, '../icons/512x512.png'),
     webPreferences: { nodeIntegration: true }
   });
   mainWindow.loadFile('static/index.html');
