@@ -36,12 +36,23 @@ const menuTemplate = [
       {
         label: 'Next Activity',
         accelerator: 'Right',
-        click: gotoNextActivitiy
+        click: () => notify('goto-next-activity')
       },
       {
         label: 'Previous Activity',
         accelerator: 'Left',
-        click: gotoPrevActivitiy
+        click: () => notify('goto-prev-activity')
+      },
+      { type: 'separator' },
+      {
+        label: 'Next Month',
+        accelerator: 'Down',
+        click: () => notify('goto-next-month')
+      },
+      {
+        label: 'Previous Month',
+        accelerator: 'Up',
+        click: () => notify('goto-prev-month')
       }
     ]
   },
@@ -55,13 +66,10 @@ const menuTemplate = [
 ];
 
 function createMenu() {
+  // @ts-ignore
   Menu.setApplicationMenu(Menu.buildFromTemplate(menuTemplate));
 }
 
-function gotoNextActivitiy() {
-  BrowserWindow.getAllWindows().forEach(win => win.webContents.send('goto-next-activity'));
-}
-
-function gotoPrevActivitiy() {
-  BrowserWindow.getAllWindows().forEach(win => win.webContents.send('goto-prev-activity'));
+function notify(channel, ...args) {
+  BrowserWindow.getAllWindows().forEach(win => win.webContents.send(channel, ...args));
 }

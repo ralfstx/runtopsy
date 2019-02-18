@@ -25,14 +25,12 @@
       map.showTiles(config.mapboxAccessToken);
     });
     ipc.on('activity', (event, activity) => {
-      updateActivity(activity);
+      addActivity(activity);
     });
-    ipc.on('goto-next-activity', () => {
-      selectActivity(getNextActivity());
-    });
-    ipc.on('goto-prev-activity', () => {
-      selectActivity(getPrevActivity());
-    });
+    ipc.on('goto-next-activity', () => selectActivity(getNextActivity()));
+    ipc.on('goto-prev-activity', () => selectActivity(getPrevActivity()));
+    ipc.on('goto-next-month', () => selectActivity(getNextMonthActivity()));
+    ipc.on('goto-prev-month', () => selectActivity(getPrevMonthActivity()));
     ipc.send('get-config');
     ipc.send('get-activities');
   }
@@ -48,7 +46,7 @@
     map = MapView.create('map');
   }
 
-  async function updateActivity(activity) {
+  async function addActivity(activity) {
     activities[activity.id] = activity;
     let orderedIds = getOrderedActivityIds();
     let orderedActivities = orderedIds.map(id => activities[id]);
@@ -59,7 +57,7 @@
     if (!currentActivity) return;
     let orderedIds = getOrderedActivityIds();
     let currentIndex = orderedIds.indexOf(currentActivity.id);
-    if (currentIndex !== -1 && currentIndex <= orderedIds.length) {
+    if (currentIndex !== -1 && currentIndex < orderedIds.length - 1) {
       return activities[orderedIds[currentIndex + 1]];
     }
   }
@@ -70,6 +68,34 @@
     let currentIndex = orderedIds.indexOf(currentActivity.id);
     if (currentIndex !== -1 && currentIndex > 0) {
       return activities[orderedIds[currentIndex - 1]];
+    }
+  }
+
+  function getNextMonthActivity() {
+    if (!currentActivity) return;
+    let orderedIds = getOrderedActivityIds();
+    let currentMonth = DateTime.fromISO(currentActivity.start).startOf('month');
+    let index = orderedIds.indexOf(currentActivity.id);
+    while (index !== -1 && index < orderedIds.length - 1) {
+      index++;
+      let activity = activities[orderedIds[index]];
+      if (DateTime.fromISO(activity.start).startOf('month') > currentMonth) {
+        return activity;
+      }
+    }
+  }
+
+  function getPrevMonthActivity() {
+    if (!currentActivity) return;
+    let orderedIds = getOrderedActivityIds();
+    let currentMonth = DateTime.fromISO(currentActivity.start).startOf('month');
+    let index = orderedIds.indexOf(currentActivity.id);
+    while (index !== -1 && index > 0) {
+      index--;
+      let activity = activities[orderedIds[index]];
+      if (DateTime.fromISO(activity.start).startOf('month') < currentMonth) {
+        return activity;
+      }
     }
   }
 
