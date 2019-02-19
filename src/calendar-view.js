@@ -2,17 +2,19 @@
 (function() {
 
   // @ts-ignore
-  const { DateTime, Interval } = window.luxon;
+  const { addDays, addMonths, differenceInMonths, endOfMonth, endOfWeek, format, getDate, isSameMonth, startOfMonth, subMonths } = window.dateFns;
 
   // @ts-ignore
   window.runtopsy.CalendarView = {
     create
   };
 
+  const weekStartsOn = 1;
+
   function create(id, options = {}) {
 
     let rowCount = Math.max(1, options.rowCount || 5);
-    let firstMonth = options.firstMonth || DateTime.local().startOf('month').minus({months: rowCount - 1});
+    let firstMonth = options.firstMonth || subMonths(startOfMonth(Date.now()), rowCount - 1);
     let onClick = options.onClick || (() => {});
     let svg = d3.select(`#${id}`)
       .append('svg:svg')
@@ -27,12 +29,10 @@
     };
 
     function renderMonths() {
-      let data = [];
-      for (let i = 0; i < rowCount; i++) {
-        data.push(firstMonth.plus({months: i}));
-      }
+      let data = Array.from(Array(rowCount).keys())
+        .map(i => addMonths(firstMonth, i));
       let selection = svg.selectAll('.month')
-        .data(data, d => d.toFormat('yyyy-LL'));
+        .data(data, d => format(d, 'YYYY-MM'));
       // exiting
       selection.exit()
         .remove();
@@ -48,20 +48,20 @@
       entering.append('text')
         .attr('x', 5)
         .attr('y', -16)
-        .text(d => d.toFormat('LLLL yyyy'));
+        .text(d => format(d, 'MMMM YYYY'));
       entering.each(function(d) {
         let group = d3.select(this);
-        let firstDay = d.startOf('month');
-        let lastDayOfMonth = d.endOf('month');
-        while (firstDay.month == d.month) {
-          let lastDay = firstDay.endOf('week');
+        let firstDay = startOfMonth(d);
+        let lastDayOfMonth = endOfMonth(d);
+        while (isSameMonth(firstDay, d)) {
+          let lastDay = endOfWeek(firstDay, {weekStartsOn});
           if (lastDay > lastDayOfMonth) lastDay = lastDayOfMonth;
           group.append('line')
             .attr('x1', getX(firstDay) - 7)
             .attr('x2', getX(lastDay) + 7)
             .attr('y1', 0)
             .attr('y2', 0);
-          firstDay = lastDay.plus({days: 1});
+          firstDay = addDays(lastDay, 1);
         }
       });
     }
@@ -74,14 +74,14 @@
       // updating
       selection
         .transition().duration(500)
-        .attr('cy', d => getY(DateTime.fromISO(d.start)));
+        .attr('cy', d => getY(d.start));
       // entering
       selection.enter()
         .append('circle')
         .attr('class', 'activity')
         .attr('r', 7)
-        .attr('cx', d => getX(DateTime.fromISO(d.start)))
-        .attr('cy', d => getY(DateTime.fromISO(d.start)))
+        .attr('cx', d => getX(d.start))
+        .attr('cy', d => getY(d.start))
         .on('click', d => onClick(d));
     }
 
@@ -91,12 +91,12 @@
         .attr('r', d => d.id === activity.id ? 8 : 7);
     }
 
-    function getX(dateTime) {
-      return 10 + (dateTime.day - 1) * 22;
+    function getX(date) {
+      return 10 + (getDate(date) - 1) * 22;
     }
 
-    function getY(dateTime) {
-      let diff = Interval.fromDateTimes(firstMonth, dateTime.startOf('month')).length('months');
+    function getY(date) {
+      let diff = differenceInMonths(startOfMonth(date), firstMonth);
       return 40 + diff * 50;
     }
 

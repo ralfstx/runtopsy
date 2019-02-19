@@ -5,7 +5,7 @@
   // @ts-ignore
   const humanizeDuration = window.humanizeDuration;
   // @ts-ignore
-  const { DateTime } = window.luxon;
+  const { format, startOfMonth } = window.dateFns;
   // @ts-ignore
   const CalendarView = window.runtopsy.CalendarView;
   // @ts-ignore
@@ -74,12 +74,12 @@
   function getNextMonthActivity() {
     if (!currentActivity) return;
     let orderedIds = getOrderedActivityIds();
-    let currentMonth = DateTime.fromISO(currentActivity.start).startOf('month');
+    let currentMonth = startOfMonth(currentActivity.start);
     let index = orderedIds.indexOf(currentActivity.id);
     while (index !== -1 && index < orderedIds.length - 1) {
       index++;
       let activity = activities[orderedIds[index]];
-      if (DateTime.fromISO(activity.start).startOf('month') > currentMonth) {
+      if (startOfMonth(activity.start) > currentMonth) {
         return activity;
       }
     }
@@ -88,12 +88,12 @@
   function getPrevMonthActivity() {
     if (!currentActivity) return;
     let orderedIds = getOrderedActivityIds();
-    let currentMonth = DateTime.fromISO(currentActivity.start).startOf('month');
+    let currentMonth = startOfMonth(currentActivity.start);
     let index = orderedIds.indexOf(currentActivity.id);
     while (index !== -1 && index > 0) {
       index--;
       let activity = activities[orderedIds[index]];
-      if (DateTime.fromISO(activity.start).startOf('month') < currentMonth) {
+      if (startOfMonth(activity.start) < currentMonth) {
         return activity;
       }
     }
@@ -120,9 +120,9 @@
   }
 
   function updateTitle(activity) {
-    let date = DateTime.fromISO(activity.start).toFormat('cccc, LLLL d, yyyy');
-    let start = DateTime.fromISO(activity.start).toFormat('H:mm');
-    let end = DateTime.fromISO(activity.end).toFormat('H:mm');
+    let date = format(activity.start, 'dddd, MMMM D, YYYY');
+    let start = format(activity.start, 'H:mm');
+    let end = format(activity.end, 'H:mm');
     let title = `${date} &nbsp; ${start} – ${end}`;
     document.getElementById('details-title').innerHTML = `<h3>${title}</h3>`;
   }
