@@ -96,7 +96,12 @@ function extractActivity(session) {
 }
 
 function extractRecord(record) {
-  let result = {};
+  let result = {
+    time: record.timestamp,
+    elapsed: record.elapsed_time,
+    distance: record.distance,
+    speed: record.speed
+  };
   // some records have no position
   if ('position_lat' in record && 'position_long' in record) {
     result.position = [record.position_lat, record.position_long];

@@ -17,7 +17,6 @@ body {
 #calendar .month line {
   stroke: #ccc;
   stroke-width: 4px;
-  cursor: pointer;
 }
 #calendar circle.activity {
   fill: #55aa77;
@@ -25,7 +24,20 @@ body {
 }
 #calendar circle.activity.selected {
   fill: #ff5555;
-  cursor: pointer;
+}
+
+#chart {
+  height: 75px;
+}
+
+#chart .line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1px;
+}
+
+#chart .area {
+  fill: lightsteelblue;
 }
 
 #details {
@@ -40,6 +52,7 @@ body {
 #info table {
   width: 600px;
   margin-top: 12px;
+  margin-bottom: 12px;
   margin-left: auto;
   margin-right: auto;
 }

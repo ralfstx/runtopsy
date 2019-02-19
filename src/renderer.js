@@ -1,18 +1,18 @@
 (function() {
 
-  const ipc = window.ipc;
-  const humanizeDuration = window.humanizeDuration;
+  const { humanizeDuration, ipc } = window;
   const { addMonths, closestIndexTo, endOfMonth, format, isAfter, isBefore, subMonths } = window.dateFns;
-  const CalendarView = window.runtopsy.CalendarView;
-  const MapView = window.runtopsy.MapView;
+  const { CalendarView, ChartView, MapView } = window.runtopsy;
 
   let activities = {};
   let orderedActivities = [];
   let currentActivity = null;
   let calendar;
+  let chart;
   let map;
 
   initCalendar();
+  initChart();
   initMap();
   initIpc();
 
@@ -35,6 +35,10 @@
     calendar = CalendarView.create('calendar', {
       onClick: a => selectActivity(a.id)
     });
+  }
+
+  function initChart() {
+    chart = ChartView.create('chart');
   }
 
   function initMap() {
@@ -87,6 +91,7 @@
     currentActivity = activity;
     showDetails();
     updateMap(activity);
+    updateChart(activity);
     updateTitle(activity);
     updateResults(activity);
     calendar.setActive(activity);
@@ -115,6 +120,10 @@
 
   function updateMap(activity) {
     map.showActivity(activity);
+  }
+
+  function updateChart(activity) {
+    chart.showActivity(activity);
   }
 
   function formatPace(pace) {
