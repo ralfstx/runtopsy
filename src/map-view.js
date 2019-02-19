@@ -1,7 +1,6 @@
 /* global L */
 (function() {
 
-  // @ts-ignore
   window.runtopsy.MapView = {
     create
   };
@@ -23,7 +22,6 @@
         attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>,'
           + ' Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
         maxZoom: 18,
-        // @ts-ignore incomplete typings
         // alternative: 'mapbox.streets'
         id: 'mapbox.outdoors',
         accessToken

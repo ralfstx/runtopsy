@@ -1,14 +1,9 @@
 (function() {
 
-  // @ts-ignore
   const ipc = window.ipc;
-  // @ts-ignore
   const humanizeDuration = window.humanizeDuration;
-  // @ts-ignore
   const { addMonths, closestIndexTo, endOfMonth, format, isAfter, isBefore, subMonths } = window.dateFns;
-  // @ts-ignore
   const CalendarView = window.runtopsy.CalendarView;
-  // @ts-ignore
   const MapView = window.runtopsy.MapView;
 
   let activities = {};
@@ -37,7 +32,6 @@
   }
 
   function initCalendar() {
-    // @ts-ignore
     calendar = CalendarView.create('calendar', {
       onClick: a => selectActivity(a.id)
     });

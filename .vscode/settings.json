@@ -1,0 +1,12 @@
+{
+  "editor.insertSpaces": true,
+  "editor.rulers": [120],
+  "editor.tabSize": 2,
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+  "files.trimTrailingWhitespace": true,
+  "javascript.implicitProjectConfig.checkJs": false,
+  "cSpell.userWords": [
+    "runtopsy"
+  ]
+}

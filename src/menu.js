@@ -66,7 +66,6 @@ const menuTemplate = [
 ];
 
 function createMenu() {
-  // @ts-ignore
   Menu.setApplicationMenu(Menu.buildFromTemplate(menuTemplate));
 }
 

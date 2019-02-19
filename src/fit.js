@@ -15,7 +15,6 @@ const easyFit = new EasyFit({
 async function readFitFile(file) {
   let content = await readFile(file);
   return new Promise((resolve, reject) => {
-    // @ts-ignore parse not included in typings
     easyFit.parse(content, (err, data) => {
       if (err) {
         reject(err);

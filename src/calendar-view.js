@@ -1,10 +1,8 @@
 /* global d3 */
 (function() {
 
-  // @ts-ignore
   const { addDays, addMonths, differenceInMonths, endOfMonth, endOfWeek, format, getDate, isSameMonth, startOfMonth, subMonths } = window.dateFns;
 
-  // @ts-ignore
   window.runtopsy.CalendarView = {
     create
   };
