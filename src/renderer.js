@@ -5,13 +5,14 @@
   // @ts-ignore
   const humanizeDuration = window.humanizeDuration;
   // @ts-ignore
-  const { format, startOfMonth } = window.dateFns;
+  const { addMonths, closestIndexTo, endOfMonth, format, isAfter, isBefore, subMonths } = window.dateFns;
   // @ts-ignore
   const CalendarView = window.runtopsy.CalendarView;
   // @ts-ignore
   const MapView = window.runtopsy.MapView;
 
   let activities = {};
+  let orderedActivities = [];
   let currentActivity = null;
   let calendar;
   let map;
@@ -48,59 +49,41 @@
 
   async function addActivity(activity) {
     activities[activity.id] = activity;
-    let orderedIds = getOrderedActivityIds();
-    let orderedActivities = orderedIds.map(id => activities[id]);
+    let orderedIds = Object.keys(activities).sort((a, b) => parseInt(a) - parseInt(b));
+    orderedActivities = orderedIds.map(id => activities[id]);
     calendar.showActivities(orderedActivities);
   }
 
   function getNextActivity() {
     if (!currentActivity) return;
-    let orderedIds = getOrderedActivityIds();
-    let currentIndex = orderedIds.indexOf(currentActivity.id);
-    if (currentIndex !== -1 && currentIndex < orderedIds.length - 1) {
-      return activities[orderedIds[currentIndex + 1]];
+    let currentIndex = orderedActivities.indexOf(currentActivity);
+    if (currentIndex !== -1 && currentIndex < orderedActivities.length - 1) {
+      return orderedActivities[currentIndex + 1];
     }
   }
 
   function getPrevActivity() {
     if (!currentActivity) return;
-    let orderedIds = getOrderedActivityIds();
-    let currentIndex = orderedIds.indexOf(currentActivity.id);
+    let currentIndex = orderedActivities.indexOf(currentActivity);
     if (currentIndex !== -1 && currentIndex > 0) {
-      return activities[orderedIds[currentIndex - 1]];
+      return orderedActivities[currentIndex - 1];
     }
   }
 
   function getNextMonthActivity() {
     if (!currentActivity) return;
-    let orderedIds = getOrderedActivityIds();
-    let currentMonth = startOfMonth(currentActivity.start);
-    let index = orderedIds.indexOf(currentActivity.id);
-    while (index !== -1 && index < orderedIds.length - 1) {
-      index++;
-      let activity = activities[orderedIds[index]];
-      if (startOfMonth(activity.start) > currentMonth) {
-        return activity;
-      }
-    }
+    let monthEnd = endOfMonth(currentActivity.start);
+    let candidates = orderedActivities.filter(a => isAfter(a.start, monthEnd));
+    let index = closestIndexTo(addMonths(currentActivity.start, 1), candidates.map(a => a.start));
+    return candidates[index] || null;
   }
 
   function getPrevMonthActivity() {
     if (!currentActivity) return;
-    let orderedIds = getOrderedActivityIds();
-    let currentMonth = startOfMonth(currentActivity.start);
-    let index = orderedIds.indexOf(currentActivity.id);
-    while (index !== -1 && index > 0) {
-      index--;
-      let activity = activities[orderedIds[index]];
-      if (startOfMonth(activity.start) < currentMonth) {
-        return activity;
-      }
-    }
-  }
-
-  function getOrderedActivityIds() {
-    return Object.keys(activities).sort((a, b) => parseInt(a) - parseInt(b));
+    let monthStart = endOfMonth(currentActivity.start);
+    let candidates = orderedActivities.filter(a => isBefore(a.start, monthStart));
+    let index = closestIndexTo(subMonths(currentActivity.start, 1), candidates.map(a => a.start));
+    return candidates[index] || null;
   }
 
   function selectActivity(activity) {
