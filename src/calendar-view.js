@@ -11,7 +11,7 @@
 
   function create(id, options = {}) {
 
-    let rowCount = Math.max(1, options.rowCount || 5);
+    let rowCount = Math.max(1, options.rowCount || 4);
     let firstMonth = options.firstMonth || subMonths(startOfMonth(Date.now()), rowCount - 1);
     let onClick = options.onClick || (() => {});
     let svg = d3.select(`#${id}`)

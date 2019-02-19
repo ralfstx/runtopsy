@@ -5,7 +5,7 @@
 
   function create(id) {
     let width = 700;
-    let height = 75;
+    let height = 85;
     let svg = d3.select(`#${id}`)
       .append('svg:svg')
       .attr('width', '100%')
