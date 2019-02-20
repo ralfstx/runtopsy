@@ -30,7 +30,8 @@ body {
   height: 85px;
 }
 
-#chart .line {
+#chart .line,
+#chart .cursor {
   fill: none;
   stroke: steelblue;
   stroke-width: 1px;

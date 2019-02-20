@@ -38,7 +38,9 @@
   }
 
   function initChart() {
-    chart = ChartView.create('chart');
+    chart = ChartView.create('chart', {
+      onHover: record => map.showPosition(record && record.position)
+    });
   }
 
   function initMap() {
