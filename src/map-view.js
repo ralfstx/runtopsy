@@ -47,6 +47,7 @@
         .map(record => record.position)
         .filter(point => point != null);
       trackLayer.setLatLngs(allPoints);
+      if (!activity.records || !activity.records.length) return;
       map.fitBounds(trackLayer.getBounds(), { padding: [10, 10] });
     }
 

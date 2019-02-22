@@ -41,6 +41,7 @@
       svg.selectAll('.line').remove();
       svg.selectAll('.area').remove();
       svg.selectAll('.cursor').remove();
+      if (!data.length) return;
       svg.append('path')
         .data([data])
         .attr('class', 'area')
