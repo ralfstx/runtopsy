@@ -19,6 +19,10 @@ body {
   stroke-width: 4px;
 }
 #calendar circle.activity {
+  fill: #888;
+  cursor: pointer;
+}
+#calendar circle.activity.running {
   fill: #55aa77;
   cursor: pointer;
 }

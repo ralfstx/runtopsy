@@ -31,7 +31,7 @@
         accessToken
       }).addTo(map);
       trackLayer = L.polyline([], {
-        color: 'red'
+        color: '#ff5555'
       }).addTo(map);
       markerLayer = L.circleMarker([0, 0], {
         radius: 8,

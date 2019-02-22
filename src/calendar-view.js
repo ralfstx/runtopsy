@@ -76,7 +76,7 @@
       // entering
       selection.enter()
         .append('circle')
-        .attr('class', 'activity')
+        .attr('class', d => 'activity ' + d.type)
         .attr('r', 7)
         .attr('cx', d => getX(d.start))
         .attr('cy', d => getY(d.start))
