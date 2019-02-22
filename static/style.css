@@ -26,8 +26,10 @@ body {
   fill: #55aa77;
   cursor: pointer;
 }
-#calendar circle.activity.selected {
-  fill: #ff5555;
+#calendar circle.cursor {
+  fill: none;
+  stroke: #ff5555;
+  stroke-width: 3.5px;
 }
 
 #chart {
@@ -72,4 +74,8 @@ body {
   font-size: 18px;
   font-weight: bold;
   text-align: center;
+}
+
+.hidden {
+  opacity: 0 !important;
 }

@@ -1,7 +1,8 @@
 /* global d3 */
 (function() {
 
-  const { addDays, addMonths, differenceInMonths, endOfMonth, endOfWeek, format, getDate, isSameMonth, startOfMonth, subMonths } = window.dateFns;
+  const { addDays, addMonths, differenceInCalendarWeeks, differenceInMonths, endOfMonth, endOfWeek, format, getDate,
+    isSameMonth, startOfMonth, subMonths } = window.dateFns;
 
   window.runtopsy.CalendarView = {
     create
@@ -20,6 +21,7 @@
       .attr('height', '100%');
 
     renderMonths();
+    createCursor();
 
     return {
       showActivities,
@@ -55,13 +57,20 @@
           let lastDay = endOfWeek(firstDay, {weekStartsOn});
           if (lastDay > lastDayOfMonth) lastDay = lastDayOfMonth;
           group.append('line')
-            .attr('x1', getX(firstDay) - 7)
-            .attr('x2', getX(lastDay) + 7)
+            .attr('x1', getX(firstDay) - 12)
+            .attr('x2', getX(lastDay) + 12)
             .attr('y1', 0)
             .attr('y2', 0);
           firstDay = addDays(lastDay, 1);
         }
       });
+    }
+
+    function createCursor() {
+      svg.append('circle')
+        .attr('class', 'cursor')
+        .classed('hidden', true)
+        .attr('r', 13);
     }
 
     function showActivities(activities) {
@@ -87,10 +96,15 @@
       svg.selectAll('.activity')
         .classed('selected', d => d.id === activity.id)
         .attr('r', d => d.id === activity.id ? 8 : 7);
+      svg.select('.cursor')
+        .classed('hidden', false)
+        .attr('cx', getX(activity.start))
+        .attr('cy', getY(activity.start));
     }
 
     function getX(date) {
-      return 10 + (getDate(date) - 1) * 22;
+      var week = differenceInCalendarWeeks(date, startOfMonth(date), {weekStartsOn: 1});
+      return 15 + (week * 10) + (getDate(date) - 1) * 22;
     }
 
     function getY(date) {
