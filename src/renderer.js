@@ -104,7 +104,7 @@
   }
 
   function showDetails() {
-    document.getElementById('details').style.opacity = '1';
+    Array.from(document.getElementsByClassName('details')).forEach(el => el.classList.remove('hidden'));
   }
 
   function updateTitle(activity) {

@@ -1,6 +1,6 @@
 body {
   padding: 0;
-  margin: 20px;
+  margin: 0;
   font-family: 'Open Sans', sans-serif;
   font-size: 12px;
   font-weight: 400;
@@ -9,8 +9,8 @@ body {
 
 #calendar {
   height: 220px;
+  margin: 10px 0;
 }
-
 #calendar .month text {
   fill: #555;
 }
@@ -42,13 +42,19 @@ body {
   stroke: steelblue;
   stroke-width: 1px;
 }
-
 #chart .area {
   fill: lightsteelblue;
 }
+#chart .scale text {
+  fill: #555;
+}
+#chart .scale line,
+#chart .scale path {
+  stroke: steelblue;
+}
 
-#details {
-  opacity: 0;
+#details-title {
+  margin: 10px 20px;
   font-size: 14px;
 }
 

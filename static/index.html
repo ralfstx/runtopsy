@@ -7,28 +7,24 @@
     <link rel="stylesheet" type="text/css" href="style.css" />
   </head>
   <body>
-    <div id="main">
-      <div id="calendar"></div>
-      <div id="details">
-        <div id="details-title"></div>
-        <div id="map"></div>
-        <div id="info">
-          <table class="results">
-            <tr>
-              <th><div>Distance</div></th>
-              <th><div>Average pace</div></th>
-              <th><div>Moving time</div></th>
-            </tr>
-            <tr>
-              <td><div id="value-distance"></div></td>
-              <td><div id="value-avg-pace"></div></td>
-              <td><div id="value-mov-time"></div></td>
-            </tr>
-          </table>
-          <div id="chart"></div>
-        </div>
-      </div>
+    <div id="calendar"></div>
+    <div id="details-title" class="details hidden"></div>
+    <div id="map" class="details hidden"></div>
+    <div id="info" class="details hidden">
+      <table class="results">
+        <tr>
+          <th><div>Distance</div></th>
+          <th><div>Average pace</div></th>
+          <th><div>Moving time</div></th>
+        </tr>
+        <tr>
+          <td><div id="value-distance"></div></td>
+          <td><div id="value-avg-pace"></div></td>
+          <td><div id="value-mov-time"></div></td>
+        </tr>
+      </table>
     </div>
+    <div id="chart" class="details hidden"></div>
     <script src="../node_modules/leaflet/dist/leaflet.js"></script>
     <script src="../node_modules/d3/dist/d3.min.js"></script>
     <script src="../node_modules/humanize-duration/humanize-duration.js"></script>

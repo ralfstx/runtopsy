@@ -3,12 +3,11 @@
 
   const { addDays, addMonths, differenceInCalendarWeeks, differenceInMonths, endOfMonth, endOfWeek, format, getDate,
     isSameMonth, startOfMonth, subMonths } = window.dateFns;
-
-  window.runtopsy.CalendarView = {
-    create
-  };
-
   const weekStartsOn = 1;
+  const xMargin = 20;
+  const yMargin = 20;
+
+  window.runtopsy.CalendarView = { create };
 
   function create(id, options = {}) {
 
@@ -46,7 +45,7 @@
         .attr('class', 'month')
         .attr('transform', d => `translate(0,${getY(d)})`);
       entering.append('text')
-        .attr('x', 5)
+        .attr('x', xMargin + 7)
         .attr('y', -16)
         .text(d => format(d, 'MMMM YYYY'));
       entering.each(function(d) {
@@ -104,12 +103,12 @@
 
     function getX(date) {
       var week = differenceInCalendarWeeks(date, startOfMonth(date), {weekStartsOn: 1});
-      return 15 + (week * 10) + (getDate(date) - 1) * 22;
+      return xMargin + 12 + (week * 10) + (getDate(date) - 1) * 22;
     }
 
     function getY(date) {
       let diff = differenceInMonths(startOfMonth(date), firstMonth);
-      return 40 + diff * 50;
+      return yMargin + 20 + diff * 50;
     }
 
   }
