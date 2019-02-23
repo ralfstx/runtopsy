@@ -4,8 +4,8 @@
   const { addDays, addMonths, differenceInCalendarWeeks, differenceInMonths, endOfMonth, endOfWeek, format, getDate,
     isSameMonth, startOfMonth, subMonths } = window.dateFns;
   const weekStartsOn = 1;
-  const xMargin = 20;
-  const yMargin = 20;
+  const xMargin = 10;
+  const yMargin = 10;
 
   window.runtopsy.CalendarView = { create };
 
@@ -14,6 +14,7 @@
     let rowCount = Math.max(1, options.rowCount || 4);
     let firstMonth = options.firstMonth || subMonths(startOfMonth(Date.now()), rowCount - 1);
     let onClick = options.onClick || (() => {});
+    let getLabel = d => d.distance ? d.distance.toPrecision(2) : '';
     let svg = d3.select(`#${id}`)
       .append('svg:svg')
       .attr('width', '100%')
@@ -45,8 +46,8 @@
         .attr('class', 'month')
         .attr('transform', d => `translate(0,${getY(d)})`);
       entering.append('text')
-        .attr('x', xMargin + 7)
-        .attr('y', -16)
+        .attr('x', xMargin)
+        .attr('y', -14)
         .text(d => format(d, 'MMMM YYYY'));
       entering.each(function(d) {
         let group = d3.select(this);
@@ -69,7 +70,7 @@
       svg.append('circle')
         .attr('class', 'cursor')
         .classed('hidden', true)
-        .attr('r', 13);
+        .attr('r', 11);
     }
 
     function showActivities(activities) {
@@ -82,13 +83,24 @@
         .transition().duration(500)
         .attr('cy', d => getY(d.start));
       // entering
-      selection.enter()
+      let groups = selection.enter()
+        .append('g')
+        .attr('class', 'activity')
+        .attr('transform', d => `translate(${getX(d.start)},${getY(d.start)})`);
+      groups
         .append('circle')
-        .attr('class', d => 'activity ' + d.type)
+        .attr('class', d => d.type)
+        .attr('cx', 0)
+        .attr('cy', 0)
         .attr('r', 7)
-        .attr('cx', d => getX(d.start))
-        .attr('cy', d => getY(d.start))
         .on('click', d => onClick(d));
+      groups
+        .append('text')
+        .attr('x', 0)
+        .attr('y', 12)
+        .attr('alignment-baseline', 'hanging')
+        .attr('text-anchor', 'middle')
+        .text(getLabel);
     }
 
     function setActive(activity) {
@@ -108,7 +120,7 @@
 
     function getY(date) {
       let diff = differenceInMonths(startOfMonth(date), firstMonth);
-      return yMargin + 20 + diff * 50;
+      return yMargin + 20 + diff * 55;
     }
 
   }

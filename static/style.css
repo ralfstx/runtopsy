@@ -9,7 +9,7 @@ body {
 
 #calendar {
   height: 220px;
-  margin: 10px 0;
+  margin: 10px;
 }
 #calendar .month text {
   fill: #555;
@@ -18,22 +18,26 @@ body {
   stroke: #ccc;
   stroke-width: 4px;
 }
-#calendar circle.activity {
+#calendar .activity circle {
   fill: #888;
   cursor: pointer;
 }
-#calendar circle.activity.running {
+#calendar .activity circle.running {
   fill: #55aa77;
-  cursor: pointer;
+}
+#calendar .activity text {
+  fill: #555;
+  user-select: none;
 }
 #calendar circle.cursor {
   fill: none;
   stroke: #ff5555;
-  stroke-width: 3.5px;
+  stroke-width: 2.5px;
 }
 
 #chart {
   height: 85px;
+  margin: 10px;
 }
 
 #chart .line,
@@ -62,6 +66,9 @@ body {
   height: 350px;
 }
 
+#info {
+  margin: 10px;
+}
 #info table {
   width: 600px;
   margin-top: 20px;

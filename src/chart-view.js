@@ -2,7 +2,7 @@
 (function() {
 
   const scaleHeight = 20;
-  const xMargin = 20;
+  const xMargin = 10;
 
   window.runtopsy.ChartView = { create };
 
