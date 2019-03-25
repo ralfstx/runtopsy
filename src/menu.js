@@ -1,7 +1,8 @@
-const { BrowserWindow, Menu } = require('electron');
-const { importFiles } = require('./model');
+const { BrowserWindow, ipcMain, Menu } = require('electron');
 
-exports.createMenu = createMenu;
+exports = {
+  createMenu
+};
 
 const menuTemplate = [
   {
@@ -10,7 +11,7 @@ const menuTemplate = [
       {
         label: 'Import',
         accelerator: 'CmdOrCtrl+I',
-        click: importFiles
+        click: () => notifyMain('import')
       },
       { type: 'separator' },
       { role: 'quit' },
@@ -36,23 +37,23 @@ const menuTemplate = [
       {
         label: 'Next Activity',
         accelerator: 'Right',
-        click: () => notify('goto-next-activity')
+        click: () => notifyRenderer('goto-next-activity')
       },
       {
         label: 'Previous Activity',
         accelerator: 'Left',
-        click: () => notify('goto-prev-activity')
+        click: () => notifyRenderer('goto-prev-activity')
       },
       { type: 'separator' },
       {
         label: 'Next Month',
         accelerator: 'Down',
-        click: () => notify('goto-next-month')
+        click: () => notifyRenderer('goto-next-month')
       },
       {
         label: 'Previous Month',
         accelerator: 'Up',
-        click: () => notify('goto-prev-month')
+        click: () => notifyRenderer('goto-prev-month')
       }
     ]
   },
@@ -69,6 +70,10 @@ function createMenu() {
   Menu.setApplicationMenu(Menu.buildFromTemplate(menuTemplate));
 }
 
-function notify(channel, ...args) {
-  BrowserWindow.getAllWindows().forEach(win => win.webContents.send(channel, ...args));
+function notifyRenderer(topic, ...args) {
+  BrowserWindow.getAllWindows().forEach(win => win.webContents.send(topic, ...args));
+}
+
+function notifyMain(topic, ...args) {
+  ipcMain.emit(topic, ...args);
 }
