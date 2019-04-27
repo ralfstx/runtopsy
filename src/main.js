@@ -7,19 +7,21 @@ const { createImporter } = require('./importer');
 let mainWindow;
 let model = createModel();
 
-ipcMain.on('get-config', async (event) => {
-  event.sender.send('config', await model.getConfig());
+ipcMain.on('get-config', (event) => {
+  model.getConfig().then(config => event.sender.send('config', config)).catch(console.error);
 });
-ipcMain.on('get-activities', async (event) => {
-  for (let activity of await model.getActivities()) {
-    event.sender.send('activity', activity);
-  }
+ipcMain.on('get-activities', (event) => {
+  model.getActivities().then(activities => {
+    for (let activity of activities) {
+      event.sender.send('activity', activity);
+    }
+  }).catch(console.error);
 });
-ipcMain.on('import', async () => {
-  await startImport();
+ipcMain.on('import', () => {
+  startImport().catch(console.error);
 });
 
-app.on('ready', async () => {
+app.on('ready', () => {
   createWindow();
   createMenu();
 });
@@ -37,7 +39,7 @@ app.on('activate', () => {
 async function startImport() {
   let config = await model.getConfig();
   let importer = createImporter(config);
-  importer.importFiles(async activity => {
+  await importer.importFiles(async activity => {
     await model.addActivity(activity);
     BrowserWindow.getAllWindows().forEach(win => win.webContents.send('activity', activity));
   });
