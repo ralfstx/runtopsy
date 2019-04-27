@@ -1,5 +1,5 @@
 const { basename, join, normalize } = require('path');
-const { copy, readdir, stat } = require('fs-extra');
+const { ensureDir, copy, readdir, stat } = require('fs-extra');
 const { dialog } = require('electron');
 const { readFitFile } = require('./fit');
 
@@ -7,15 +7,20 @@ module.exports = {
   createImporter
 };
 
-function createImporter(config) {
-
-  let importDir = normalize(config.importDir);
+function createImporter(model) {
 
   return {
     importFiles
   };
 
   async function importFiles(callback) {
+    let config = await model.getConfig();
+    let configDir = await model.getConfigDir();
+
+    let filesDir = join(configDir, 'files');
+    await ensureDir(filesDir);
+
+    let importDir = normalize(config.importDir);
     if (!importDir) {
       dialog.showErrorBox('Import failed', 'Import directory not configured');
       return;
@@ -31,7 +36,7 @@ function createImporter(config) {
     }
 
     async function importFile(file) {
-      let localFile = join(config.filesDir, basename(file));
+      let localFile = join(filesDir, basename(file));
       let exists = await stat(localFile).catch(() => null);
       if (!exists) {
         console.log('importing', localFile);

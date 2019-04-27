@@ -2,7 +2,7 @@ const { join } = require('path');
 const { app, BrowserWindow, shell, ipcMain } = require('electron');
 const { createModel } = require('./model');
 const { createMenu } = require('./menu');
-const { createImporter } = require('./importer');
+const { createImporter } = require('./importer-file');
 
 let mainWindow;
 let model = createModel();
@@ -37,8 +37,7 @@ app.on('activate', () => {
 });
 
 async function startImport() {
-  let config = await model.getConfig();
-  let importer = createImporter(config);
+  let importer = createImporter(model);
   await importer.importFiles(async activity => {
     await model.addActivity(activity);
     BrowserWindow.getAllWindows().forEach(win => win.webContents.send('activity', activity));
