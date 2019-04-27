@@ -1,7 +1,9 @@
 const EasyFit = require('easy-fit').default;
 const {readFile} = require('fs-extra');
 
-exports.readFitFile = readFitFile;
+module.exports = {
+  readFitFile
+};
 
 const easyFit = new EasyFit({
   mode: 'cascade',

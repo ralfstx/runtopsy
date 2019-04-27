@@ -1,6 +1,6 @@
 const { BrowserWindow, ipcMain, Menu } = require('electron');
 
-exports = {
+module.exports = {
   createMenu
 };
 
