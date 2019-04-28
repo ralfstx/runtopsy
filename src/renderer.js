@@ -136,7 +136,7 @@
 
   function formatPace(pace) {
     let minutes = Math.trunc(pace);
-    let seconds = Math.round(pace % 1 * 60);
+    let seconds = Math.floor(pace % 1 * 60);
     return minutes + ':' + (seconds < 10 ? '0' + seconds : seconds);
   }
 
