@@ -32,28 +32,38 @@ const menuTemplate = [
     ]
   },
   {
-    label: 'Navigate',
+    label: 'Go',
     submenu: [
+      {
+        label: 'Previous Activity',
+        accelerator: 'Left',
+        click: () => notifyRenderer('goto-prev-activity')
+      },
       {
         label: 'Next Activity',
         accelerator: 'Right',
         click: () => notifyRenderer('goto-next-activity')
       },
       {
-        label: 'Previous Activity',
-        accelerator: 'Left',
-        click: () => notifyRenderer('goto-prev-activity')
+        label: 'First Activity',
+        accelerator: 'Home',
+        click: () => notifyRenderer('goto-first-activity')
+      },
+      {
+        label: 'Last Activity',
+        accelerator: 'End',
+        click: () => notifyRenderer('goto-last-activity')
       },
       { type: 'separator' },
-      {
-        label: 'Next Month',
-        accelerator: 'Down',
-        click: () => notifyRenderer('goto-next-month')
-      },
       {
         label: 'Previous Month',
         accelerator: 'Up',
         click: () => notifyRenderer('goto-prev-month')
+      },
+      {
+        label: 'Next Month',
+        accelerator: 'Down',
+        click: () => notifyRenderer('goto-next-month')
       }
     ]
   },

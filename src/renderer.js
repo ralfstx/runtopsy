@@ -23,10 +23,12 @@
     ipc.on('activities', (event, activities) => {
       addActivities(activities);
     });
+    ipc.on('goto-first-activity', () => selectActivity(getFirstActivity()));
+    ipc.on('goto-last-activity', () => selectActivity(getLastActivity()));
     ipc.on('goto-next-activity', () => selectActivity(getNextActivity() || getLastActivity()));
-    ipc.on('goto-prev-activity', () => selectActivity(getPrevActivity() || getLastActivity()));
+    ipc.on('goto-prev-activity', () => selectActivity(getPrevActivity() || getFirstActivity()));
     ipc.on('goto-next-month', () => selectActivity(getNextMonthActivity() || getLastActivity()));
-    ipc.on('goto-prev-month', () => selectActivity(getPrevMonthActivity() || getLastActivity()));
+    ipc.on('goto-prev-month', () => selectActivity(getPrevMonthActivity() || getFirstActivity()));
     ipc.send('get-config');
     ipc.send('get-activities');
   }
@@ -70,6 +72,10 @@
     if (currentIndex !== -1 && currentIndex > 0) {
       return orderedActivities[currentIndex - 1];
     }
+  }
+
+  function getFirstActivity() {
+    return orderedActivities[0] || null;
   }
 
   function getLastActivity() {
