@@ -11,6 +11,8 @@
 
   function create(id, options = {}) {
 
+    let activities = [];
+    let selected = null;
     let rowCount = Math.max(1, options.rowCount || 4);
     let firstMonth = options.firstMonth || subMonths(startOfMonth(Date.now()), rowCount - 1);
     let onClick = options.onClick || (() => {});
@@ -19,26 +21,38 @@
       .append('svg:svg')
       .attr('width', '100%')
       .attr('height', '100%');
+    svg.append('g').attr('class', 'month-layer');
+    svg.append('g').attr('class', 'activity-layer');
+    svg.append('g').attr('class', 'cursor-layer');
 
     renderMonths();
-    createCursor();
 
     return {
-      showActivities,
+      setActivities,
       setActive
     };
 
+    function setActivities(newActivities) {
+      activities = newActivities;
+      renderActivities();
+    }
+
+    function setActive(activity) {
+      selected = activity;
+      renderCursor();
+      showMonth(startOfMonth(selected.start_time));
+    }
+
     function renderMonths() {
-      let data = Array.from(Array(rowCount).keys())
+      let months = Array.from(Array(rowCount).keys())
         .map(i => addMonths(firstMonth, i));
-      let selection = svg.selectAll('.month')
-        .data(data, d => format(d, 'YYYY-MM'));
+      let selection = svg.select('.month-layer').selectAll('.month')
+        .data(months, d => format(d, 'YYYY-MM'));
       // exiting
       selection.exit()
         .remove();
       // updating
       selection
-        .transition().duration(500)
         .attr('transform', d => `translate(0,${getY(d)})`);
       // entering
       let entering = selection.enter()
@@ -66,35 +80,29 @@
       });
     }
 
-    function createCursor() {
-      svg.append('circle')
-        .attr('class', 'cursor')
-        .classed('hidden', true)
-        .attr('r', 11);
-    }
-
-    function showActivities(activities) {
-      let selection = svg.selectAll('.activity').data(activities, d => d.id);
+    function renderActivities() {
+      let selection = svg.select('.activity-layer').selectAll('.activity')
+        .data(activities, d => d.id);
       // exiting
       selection.exit()
         .remove();
       // updating
       selection
-        .transition().duration(500)
-        .attr('cy', d => getY(d.start_time));
+        .classed('selected', d => d.id === selected && selected.id)
+        .attr('transform', d => `translate(${getX(d.start_time)},${getY(d.start_time)})`);
       // entering
-      let groups = selection.enter()
+      let entering = selection.enter()
         .append('g')
         .attr('class', 'activity')
         .attr('transform', d => `translate(${getX(d.start_time)},${getY(d.start_time)})`);
-      groups
+      entering
         .append('circle')
         .attr('class', d => d.type)
         .attr('cx', 0)
         .attr('cy', 0)
         .attr('r', 7)
         .on('click', d => onClick(d));
-      groups
+      entering
         .append('text')
         .attr('x', 0)
         .attr('y', 12)
@@ -103,14 +111,39 @@
         .text(getLabel);
     }
 
-    function setActive(activity) {
-      svg.selectAll('.activity')
-        .classed('selected', d => d.id === activity.id)
-        .attr('r', d => d.id === activity.id ? 8 : 7);
-      svg.select('.cursor')
-        .classed('hidden', false)
-        .attr('cx', getX(activity.start_time))
-        .attr('cy', getY(activity.start_time));
+    function renderCursor() {
+      let selection = svg.select('.cursor-layer').selectAll('.cursor')
+        .data(selected ? [selected] : [], d => d.id);
+      // exiting
+      selection.exit()
+        .remove();
+      // updating
+      selection
+        .attr('cx', d => getX(d.start_time))
+        .attr('cy', d => getY(d.start_time));
+      // entering
+      selection.enter()
+        .append('circle')
+        .attr('class', 'cursor')
+        .attr('r', 11)
+        .attr('cx', d => getX(d.start_time))
+        .attr('cy', d => getY(d.start_time));
+    }
+
+    function showMonth(month) {
+      let diff = differenceInMonths(month, firstMonth);
+      let correction = 0;
+      if (diff < 0) {
+        correction = diff;
+      } else if (diff >= rowCount) {
+        correction = diff - rowCount + 1;
+      }
+      if (correction) {
+        firstMonth = addMonths(firstMonth, correction);
+        renderMonths();
+        renderActivities();
+        renderCursor();
+      }
     }
 
     function getX(date) {

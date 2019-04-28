@@ -53,7 +53,7 @@
     }
     let orderedIds = Object.keys(activities).sort((a, b) => parseInt(a) - parseInt(b));
     orderedActivities = orderedIds.map(id => activities[id]);
-    calendar.showActivities(orderedActivities);
+    calendar.setActivities(orderedActivities);
   }
 
   function getNextActivity() {
