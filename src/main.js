@@ -12,9 +12,7 @@ ipcMain.on('get-config', (event) => {
 });
 ipcMain.on('get-activities', (event) => {
   model.getActivities().then(activities => {
-    for (let activity of activities) {
-      event.sender.send('activity', activity);
-    }
+    event.sender.send('activities', activities);
   }).catch(console.error);
 });
 ipcMain.on('import', () => {
@@ -40,7 +38,7 @@ async function startImport() {
   let importer = createImporter(model);
   await importer.importFiles(async activity => {
     await model.addActivity(activity);
-    BrowserWindow.getAllWindows().forEach(win => win.webContents.send('activity', activity));
+    BrowserWindow.getAllWindows().forEach(win => win.webContents.send('activities', [activity]));
   });
 }
 

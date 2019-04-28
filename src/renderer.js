@@ -20,8 +20,8 @@
     ipc.on('config', (event, config) => {
       map.showTiles(config.mapboxAccessToken);
     });
-    ipc.on('activity', (event, activity) => {
-      addActivity(activity);
+    ipc.on('activities', (event, activities) => {
+      addActivities(activities);
     });
     ipc.on('goto-next-activity', () => selectActivity(getNextActivity() || getLastActivity()));
     ipc.on('goto-prev-activity', () => selectActivity(getPrevActivity() || getLastActivity()));
@@ -47,8 +47,10 @@
     map = MapView.create('map');
   }
 
-  async function addActivity(activity) {
-    activities[activity.id] = activity;
+  async function addActivities(activitiesToAdd) {
+    for (let activity of activitiesToAdd) {
+      activities[activity.id] = activity;
+    }
     let orderedIds = Object.keys(activities).sort((a, b) => parseInt(a) - parseInt(b));
     orderedActivities = orderedIds.map(id => activities[id]);
     calendar.showActivities(orderedActivities);
