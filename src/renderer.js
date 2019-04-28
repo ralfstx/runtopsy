@@ -78,17 +78,17 @@
 
   function getNextMonthActivity() {
     if (!currentActivity) return;
-    let monthEnd = endOfMonth(currentActivity.start);
-    let candidates = orderedActivities.filter(a => isAfter(a.start, monthEnd));
-    let index = closestIndexTo(addMonths(currentActivity.start, 1), candidates.map(a => a.start));
+    let monthEnd = endOfMonth(currentActivity.start_time);
+    let candidates = orderedActivities.filter(a => isAfter(a.start_time, monthEnd));
+    let index = closestIndexTo(addMonths(currentActivity.start_time, 1), candidates.map(a => a.start_time));
     return candidates[index] || null;
   }
 
   function getPrevMonthActivity() {
     if (!currentActivity) return;
-    let monthStart = endOfMonth(currentActivity.start);
-    let candidates = orderedActivities.filter(a => isBefore(a.start, monthStart));
-    let index = closestIndexTo(subMonths(currentActivity.start, 1), candidates.map(a => a.start));
+    let monthStart = endOfMonth(currentActivity.start_time);
+    let candidates = orderedActivities.filter(a => isBefore(a.start_time, monthStart));
+    let index = closestIndexTo(subMonths(currentActivity.start_time, 1), candidates.map(a => a.start_time));
     return candidates[index] || null;
   }
 
@@ -110,17 +110,17 @@
   }
 
   function updateTitle(activity) {
-    let date = formatDate(activity.start, 'dddd, MMMM D, YYYY');
-    let start = formatDate(activity.start, 'H:mm');
-    let end = formatDate(activity.end, 'H:mm');
-    let title = `${date} &nbsp; ${start} – ${end}`;
+    let date = formatDate(activity.start_time, 'dddd, MMMM D, YYYY');
+    let start_time = formatDate(activity.start_time, 'H:mm');
+    let end_time = formatDate(activity.end_time, 'H:mm');
+    let title = `${date} &nbsp; ${start_time} – ${end_time}`;
     document.getElementById('details-title').innerHTML = `<h3>${title}</h3>`;
   }
 
   function updateResults(activity) {
     let distance = activity.distance.toPrecision(2) + ' km';
-    let avgPace = formatPace(60 / activity.avgSpeed);
-    let movTime = humanizeDuration(activity.movingTime * 1000, { units: ['d', 'h', 'm'], round: true });
+    let avgPace = formatPace(60 / activity.avg_speed);
+    let movTime = humanizeDuration(activity.moving_time * 1000, { units: ['d', 'h', 'm'], round: true });
     document.getElementById('value-distance').innerText = distance;
     document.getElementById('value-avg-pace').innerText = avgPace;
     document.getElementById('value-mov-time').innerText = movTime;

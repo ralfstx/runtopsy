@@ -190,13 +190,13 @@ function createImporter(model) {
     return {
       id: startTime.toString(),
       type: mapType(activity.type),
-      start: new Date(startTime).toISOString(),
-      end: new Date(startTime + activity.elapsed_time * 1000).toISOString(),
+      start_time: new Date(startTime).toISOString(),
+      end_time: new Date(startTime + activity.elapsed_time * 1000).toISOString(),
       // m -> km
       distance: activity.distance / 1000,
-      movingTime: activity.moving_time,
+      moving_time: activity.moving_time,
       // m/s -> km/h
-      avgSpeed: activity.average_speed * 3.6,
+      avg_speed: activity.average_speed * 3.6,
       track_polyline: activity.map && activity.map.summary_polyline,
       records: []
     };

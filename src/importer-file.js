@@ -75,11 +75,11 @@ function createImporter(model) {
     let activity = {
       id: Date.parse(session.start_time).toString(),
       type: session.sport,
-      start: session.start_time,
-      end: session.timestamp,
+      start_time: session.start_time,
+      end_time: session.timestamp,
       distance: session.total_distance,
-      movingTime: session.total_timer_time,
-      avgSpeed: session.avg_speed,
+      moving_time: session.total_timer_time,
+      avg_speed: session.avg_speed,
       records
     };
     return activity;

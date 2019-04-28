@@ -81,12 +81,12 @@
       // updating
       selection
         .transition().duration(500)
-        .attr('cy', d => getY(d.start));
+        .attr('cy', d => getY(d.start_time));
       // entering
       let groups = selection.enter()
         .append('g')
         .attr('class', 'activity')
-        .attr('transform', d => `translate(${getX(d.start)},${getY(d.start)})`);
+        .attr('transform', d => `translate(${getX(d.start_time)},${getY(d.start_time)})`);
       groups
         .append('circle')
         .attr('class', d => d.type)
@@ -109,8 +109,8 @@
         .attr('r', d => d.id === activity.id ? 8 : 7);
       svg.select('.cursor')
         .classed('hidden', false)
-        .attr('cx', getX(activity.start))
-        .attr('cy', getY(activity.start));
+        .attr('cx', getX(activity.start_time))
+        .attr('cy', getY(activity.start_time));
     }
 
     function getX(date) {
