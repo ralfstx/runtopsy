@@ -9,8 +9,8 @@
   function create(id, options = {}) {
     let container = document.getElementById(id);
     let onHover = options.onHover || (() => {});
-    let xSelector = record => record.distance;
-    let ySelector = record => record.speed;
+    let xSelector = record => record.distance / 1000;
+    let ySelector = record => record.speed * 3.6;
     let svg = d3.select(container)
       .append('svg:svg')
       .attr('width', '100%')

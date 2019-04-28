@@ -7,9 +7,9 @@ module.exports = {
 
 const easyFit = new EasyFit({
   mode: 'cascade',
-  lengthUnit: 'km',
+  lengthUnit: 'm',
   temperatureUnit: 'celsius',
-  speedUnit: 'km/h',
+  speedUnit: 'm/s',
   force: true,
   elapsedRecordField: true,
 });

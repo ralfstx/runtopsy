@@ -118,8 +118,8 @@
   }
 
   function updateResults(activity) {
-    let distance = activity.distance.toPrecision(2) + ' km';
-    let avgPace = formatPace(60 / activity.avg_speed);
+    let distance = (activity.distance / 1000).toPrecision(2) + ' km';
+    let avgPace = formatPace(speedToPace(activity.avg_speed));
     let movTime = humanizeDuration(activity.moving_time * 1000, { units: ['d', 'h', 'm'], round: true });
     document.getElementById('value-distance').innerText = distance;
     document.getElementById('value-avg-pace').innerText = avgPace;
@@ -132,6 +132,10 @@
 
   function updateChart(activity) {
     chart.showActivity(activity);
+  }
+
+  function speedToPace(speed) {
+    return speed > 0 ? 1000 / 60 / speed : 0;
   }
 
   function formatPace(pace) {

@@ -16,10 +16,8 @@ function createImporter(model) {
   async function importFiles(callback) {
     let config = await model.getConfig();
     let configDir = await model.getConfigDir();
-
     let filesDir = join(configDir, 'files');
     await ensureDir(filesDir);
-
     let importDir = normalize(config.importDir);
     if (!importDir) {
       dialog.showErrorBox('Import failed', 'Import directory not configured');
@@ -30,9 +28,23 @@ function createImporter(model) {
       dialog.showErrorBox('Import failed', 'Not a directory: ' + importDir);
       return;
     }
-    let files = await findFitFiles(importDir);
-    for (let file of files) {
-      await importFile(file);
+    console.log(`importing files from ${importDir}`);
+
+    await copyFiles();
+    await updateDb();
+
+    async function copyFiles() {
+      let files = await findFitFiles(importDir);
+      for (let file of files) {
+        await importFile(file);
+      }
+    }
+
+    async function updateDb() {
+      let localFiles = await findFitFiles(filesDir);
+      for (let localFile of localFiles) {
+        loadFile(localFile);
+      }
     }
 
     async function importFile(file) {
@@ -41,7 +53,6 @@ function createImporter(model) {
       if (!exists) {
         console.log('importing', localFile);
         await copy(file, localFile);
-        await loadFile(localFile);
       }
     }
 
@@ -87,8 +98,7 @@ function createImporter(model) {
 
   function extractRecord(record) {
     let result = {
-      time: record.timestamp,
-      elapsed: record.elapsed_time,
+      time: record.elapsed_time,
       distance: record.distance,
       speed: record.speed
     };

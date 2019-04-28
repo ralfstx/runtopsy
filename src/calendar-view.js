@@ -17,7 +17,6 @@
     let rowCount = Math.max(1, options.rowCount || 4);
     let firstMonth = options.firstMonth || subMonths(startOfMonth(Date.now()), rowCount - 1);
     let onClick = options.onClick || (() => {});
-    let getLabel = d => d.distance ? d.distance.toPrecision(2) : '';
     let svg = d3.select(`#${id}`)
       .append('svg:svg')
       .attr('width', '100%')
@@ -52,7 +51,7 @@
       for (let activity of activities) {
         let month = format(startOfMonth(activity.start_time), 'YYYY-MM');
         totalDistancePerMonth[month] = totalDistancePerMonth[month] || 0;
-        totalDistancePerMonth[month] += Math.floor(activity.distance);
+        totalDistancePerMonth[month] += activity.distance / 1000;
       }
     }
 
@@ -126,12 +125,21 @@
         .attr('y', 12)
         .attr('alignment-baseline', 'hanging')
         .attr('text-anchor', 'middle')
-        .text(getLabel);
+        .text(d => getDistanceFormatted(d.distance));
     }
 
     function renderTotals() {
       svg.selectAll('.month-total-distance')
-        .text(d => totalDistancePerMonth[format(d, 'YYYY-MM')] + ' km');
+        .text(d => getTotalDistanceOfMonthFormatted(d));
+    }
+
+    function getDistanceFormatted(distance) {
+      return distance > 0 ? (distance / 1000).toPrecision(2) : '';
+    }
+
+    function getTotalDistanceOfMonthFormatted(date) {
+      let totalDistance = totalDistancePerMonth[format(date, 'YYYY-MM')];
+      return totalDistance ? Math.floor(totalDistance) + ' km' : '';
     }
 
     function renderCursor() {
