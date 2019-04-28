@@ -14,6 +14,7 @@
     "humanize-duration": "^3.18.0",
     "leaflet": "^1.4.0",
     "node-fetch": "^2.4.1",
+    "polyline-encoded": "0.0.8",
     "typeface-open-sans": "0.0.54"
   },
   "devDependencies": {

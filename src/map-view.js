@@ -42,12 +42,17 @@
     }
 
     function showActivity(activity) {
+      if (!activity) return;
+      if (activity.records && activity.records.length) {
+        showLatLngs(activity.records.map(record => record.position).filter(point => !!point));
+      } else if (activity.track_polyline) {
+        showLatLngs(L.Polyline.fromEncoded(activity.track_polyline).getLatLngs());
+      }
+    }
+
+    function showLatLngs(latLngs) {
       if (!trackLayer) return;
-      let allPoints = !activity ? [] : activity.records
-        .map(record => record.position)
-        .filter(point => point != null);
-      trackLayer.setLatLngs(allPoints);
-      if (!activity.records || !activity.records.length) return;
+      trackLayer.setLatLngs(latLngs);
       map.fitBounds(trackLayer.getBounds(), { padding: [10, 10] });
     }
 
