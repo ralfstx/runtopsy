@@ -110,9 +110,9 @@
   }
 
   function updateTitle(activity) {
-    let date = format(activity.start, 'dddd, MMMM D, YYYY');
-    let start = format(activity.start, 'H:mm');
-    let end = format(activity.end, 'H:mm');
+    let date = formatDate(activity.start, 'dddd, MMMM D, YYYY');
+    let start = formatDate(activity.start, 'H:mm');
+    let end = formatDate(activity.end, 'H:mm');
     let title = `${date} &nbsp; ${start} – ${end}`;
     document.getElementById('details-title').innerHTML = `<h3>${title}</h3>`;
   }
@@ -138,6 +138,24 @@
     let minutes = Math.trunc(pace);
     let seconds = Math.round(pace % 1 * 60);
     return minutes + ':' + (seconds < 10 ? '0' + seconds : seconds);
+  }
+
+  // format adds current UTC offset to formatted dates, use date-fns UTC functions when available
+  // See https://github.com/date-fns/date-fns/issues/376
+  function formatDate(dateString, formatString) {
+    return format(getUtcDate(dateString), formatString);
+  }
+
+  function getUtcDate(dateString = Date.now()) {
+    let date = new Date(dateString);
+    return new Date(
+      date.getUTCFullYear(),
+      date.getUTCMonth(),
+      date.getUTCDate(),
+      date.getUTCHours(),
+      date.getUTCMinutes(),
+      date.getUTCSeconds(),
+    );
   }
 
 })();
