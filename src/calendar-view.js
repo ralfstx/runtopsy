@@ -13,6 +13,7 @@
 
     let activities = [];
     let selected = null;
+    let totalDistancePerMonth = {};
     let rowCount = Math.max(1, options.rowCount || 4);
     let firstMonth = options.firstMonth || subMonths(startOfMonth(Date.now()), rowCount - 1);
     let onClick = options.onClick || (() => {});
@@ -34,6 +35,8 @@
 
     function setActivities(newActivities) {
       activities = newActivities;
+      calculateTotals();
+      renderTotals();
       renderActivities();
     }
 
@@ -41,6 +44,16 @@
       selected = activity;
       renderCursor();
       showMonth(startOfMonth(selected.start_time));
+      renderTotals();
+    }
+
+    function calculateTotals() {
+      totalDistancePerMonth = {};
+      for (let activity of activities) {
+        let month = format(startOfMonth(activity.start_time), 'YYYY-MM');
+        totalDistancePerMonth[month] = totalDistancePerMonth[month] || 0;
+        totalDistancePerMonth[month] += Math.floor(activity.distance);
+      }
     }
 
     function renderMonths() {
@@ -63,6 +76,11 @@
         .attr('x', xMargin)
         .attr('y', -14)
         .text(d => format(d, 'MMMM YYYY'));
+      entering.append('text')
+        .attr('class', 'month-total-distance')
+        .attr('x', getX('2000-12-31T00:00:00Z') + 100)
+        .attr('y', 4)
+        .attr('text-anchor', 'end');
       entering.each(function(d) {
         let group = d3.select(this);
         let firstDay = startOfMonth(d);
@@ -109,6 +127,11 @@
         .attr('alignment-baseline', 'hanging')
         .attr('text-anchor', 'middle')
         .text(getLabel);
+    }
+
+    function renderTotals() {
+      svg.selectAll('.month-total-distance')
+        .text(d => totalDistancePerMonth[format(d, 'YYYY-MM')] + ' km');
     }
 
     function renderCursor() {

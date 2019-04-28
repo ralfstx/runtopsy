@@ -14,6 +14,10 @@ body {
 #calendar .month text {
   fill: #555;
 }
+#calendar text.month-total-distance {
+  fill: #555;
+  font-size: 18px;
+}
 #calendar .month line {
   stroke: #ccc;
   stroke-width: 4px;
