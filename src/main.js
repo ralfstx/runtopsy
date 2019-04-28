@@ -2,7 +2,7 @@ const { join } = require('path');
 const { app, BrowserWindow, shell, ipcMain } = require('electron');
 const { createModel } = require('./model');
 const { createMenu } = require('./menu');
-const { createImporter } = require('./importer-strava');
+const { createImporter } = require('./importer');
 
 let mainWindow;
 let model = createModel();

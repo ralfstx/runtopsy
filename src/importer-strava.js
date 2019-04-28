@@ -57,7 +57,7 @@ function createImporter(model) {
         });
         let redirectUrl = 'https://ralfstx.github.io/';
         let queryParams = {
-          client_id: config.strava_client_id,
+          client_id: config.importers.strava.client_id,
           redirect_uri: redirectUrl,
           response_type: 'code',
           scope: 'activity:read_all'
@@ -85,8 +85,8 @@ function createImporter(model) {
 
     async function requestAccessToken ({code, refresh_token}) {
       let data = Object.assign({
-        client_id: config.strava_client_id,
-        client_secret: config.strava_client_secret
+        client_id: config.importers.strava.client_id,
+        client_secret: config.importers.strava.client_secret
       }, code ? {
         grant_type: 'authorization_code',
         code

@@ -18,7 +18,7 @@ function createImporter(model) {
     let configDir = await model.getConfigDir();
     let filesDir = join(configDir, 'files');
     await ensureDir(filesDir);
-    let importDir = normalize(config.importDir);
+    let importDir = normalize(config.importers.file.importDir);
     if (!importDir) {
       dialog.showErrorBox('Import failed', 'Import directory not configured');
       return;
