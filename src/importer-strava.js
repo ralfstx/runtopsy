@@ -1,8 +1,8 @@
 const { join } = require('path');
 const { BrowserWindow, session } = require('electron');
 const { ensureDir, readdir, writeJson } = require('fs-extra');
-const fetch = require('node-fetch');
 const { readJsonSafe } = require('./files');
+const { buildQuery, getJson, postJson } = require('./rest-api');
 
 module.exports = {
   createImporter
@@ -23,6 +23,7 @@ function createImporter(model) {
     let config = await model.getConfig();
     let metadata = await readMetadata();
     await ensureAccessToken();
+    let authHeader = {Authorization: `Bearer ${access_token}`};
     await requestActivities();
     await updateDb();
 
@@ -117,7 +118,7 @@ function createImporter(model) {
       console.log('requesting activities' + (after ? ` after ${after}` : ''));
       while (!finished) {
         let query = {page, per_page, after};
-        let activities = await getJson(`${apiBaseUrl}/athlete/activities?${buildQuery(query)}`);
+        let activities = await getJson(`${apiBaseUrl}/athlete/activities?${buildQuery(query)}`, authHeader);
         console.log(`received ${activities.length} activities`);
         await processActivities(activities);
         finished = activities.length !== per_page;
@@ -211,32 +212,4 @@ function createImporter(model) {
     }
   }
 
-  function buildQuery(query) {
-    return Object.keys(query).map(key => `${key}=${encodeURIComponent(query[key])}`).join('&');
-  }
-
-  async function getJson(url) {
-    return await fetchJson('GET', url);
-  }
-
-  async function postJson(url, data = {}) {
-    return await fetchJson('POST', url, data);
-  }
-
-  async function fetchJson(method, url, data) {
-    let headers = Object.assign({},
-      access_token ? { Authorization: `Bearer ${access_token}` } : {},
-      data ? { 'Content-Type': 'application/json', } : {});
-    let options = Object.assign({ method, headers }, data ? { body: JSON.stringify(data) } : {});
-    let response = await fetch(url, options);
-    await checkStatus(response, url);
-    return await response.json();
-  }
-
-  async function checkStatus(res, url) {
-    if (!res.ok) {
-      let text = await res.text();
-      throw new Error(`HTTP ${res.status} (${res.statusText}) on ${url}:\nResponse: ${text}`);
-    }
-  }
 }
