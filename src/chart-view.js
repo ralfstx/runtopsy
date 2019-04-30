@@ -29,7 +29,7 @@
     function showActivity(activity = currentActivity) {
       if (!activity) return;
       currentActivity = activity;
-      let data = activity.records;
+      let data = activity.records || [];
       let width = container.clientWidth;
       let height = container.clientHeight;
       xScale.range([xMargin, width - xMargin]);
@@ -92,7 +92,7 @@
 
     function getRecordByValue(x, selector) {
       let value = xScale.invert(x);
-      let records = currentActivity.records;
+      let records = currentActivity.records || [];
       for (let record of records) {
         if (selector(record) >= value) {
           return record;
