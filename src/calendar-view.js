@@ -16,6 +16,7 @@
     let activitiesByMonth = {};
     let rowCount = Math.max(1, options.rowCount || 4);
     let firstMonth = options.firstMonth || subMonths(startOfMonth(Date.now()), rowCount - 1);
+    let lastScrollOffset = 0;
     let onClick = options.onClick || (() => {});
     let svg = d3.select(`#${id}`)
       .append('svg:svg')
@@ -60,15 +61,18 @@
         .data(months, d => monthString(d));
       // exiting
       selection.exit()
+        .transition(75)
+        .attr('transform', d => `translate(0,${getY(addMonths(d, -lastScrollOffset))})`)
         .remove();
       // updating
       selection
+        .transition(75)
         .attr('transform', d => `translate(0,${getY(d)})`);
       // entering
       let entering = selection.enter()
         .append('g')
         .attr('class', 'month')
-        .attr('transform', d => `translate(0,${getY(d)})`);
+        .attr('transform', d => `translate(0,${getY(addMonths(d, lastScrollOffset))})`);
       entering.append('text')
         .attr('x', xMargin)
         .attr('y', -14)
@@ -85,6 +89,9 @@
         .attr('x2', d => getX(d.lastDay) + 12)
         .attr('y1', 0)
         .attr('y2', 0);
+      entering
+        .transition(75)
+        .attr('transform', d => `translate(0,${getY(d)})`);
     }
 
     function renderActivities() {
@@ -165,14 +172,15 @@
 
     function showMonth(month) {
       let diff = differenceInMonths(month, firstMonth);
-      let correction = 0;
+      let offset = 0;
       if (diff < 0) {
-        correction = diff;
+        offset = diff;
       } else if (diff >= rowCount) {
-        correction = diff - rowCount + 1;
+        offset = diff - rowCount + 1;
       }
-      if (correction) {
-        firstMonth = addMonths(firstMonth, correction);
+      if (offset) {
+        lastScrollOffset = offset;
+        firstMonth = addMonths(firstMonth, offset);
         renderMonths();
         renderActivities();
         renderCursor();
