@@ -7,7 +7,7 @@
 
   function create(id) {
 
-    let map = L.map(id);
+    let map = L.map(id, {keyboard: false});
     let mapTileLayer;
     let trackLayer;
     let markerLayer;
