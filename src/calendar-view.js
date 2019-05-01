@@ -13,7 +13,7 @@
 
     let activities = [];
     let selected = null;
-    let totalDistancePerMonth = {};
+    let activitiesByMonth = {};
     let rowCount = Math.max(1, options.rowCount || 4);
     let firstMonth = options.firstMonth || subMonths(startOfMonth(Date.now()), rowCount - 1);
     let onClick = options.onClick || (() => {});
@@ -21,9 +21,6 @@
       .append('svg:svg')
       .attr('width', '100%')
       .attr('height', '100%');
-    svg.append('g').attr('class', 'month-layer');
-    svg.append('g').attr('class', 'activity-layer');
-    svg.append('g').attr('class', 'cursor-layer');
 
     renderMonths();
 
@@ -34,32 +31,33 @@
 
     function setActivities(newActivities) {
       activities = newActivities;
-      calculateTotals();
-      renderTotals();
+      updateActivitiesByMonth();
       renderActivities();
+      renderTotals();
     }
 
     function setActive(activity) {
       selected = activity;
       renderCursor();
       showMonth(startOfMonth(selected.start_time));
+      renderActivities();
       renderTotals();
     }
 
-    function calculateTotals() {
-      totalDistancePerMonth = {};
+    function updateActivitiesByMonth() {
+      activitiesByMonth = {};
       for (let activity of activities) {
-        let month = format(startOfMonth(activity.start_time), 'YYYY-MM');
-        totalDistancePerMonth[month] = totalDistancePerMonth[month] || 0;
-        totalDistancePerMonth[month] += activity.distance / 1000;
+        let month = monthString(startOfMonth(activity.start_time));
+        activitiesByMonth[month] = activitiesByMonth[month] || [];
+        activitiesByMonth[month].push(activity);
       }
     }
 
     function renderMonths() {
       let months = Array.from(Array(rowCount).keys())
         .map(i => addMonths(firstMonth, i));
-      let selection = svg.select('.month-layer').selectAll('.month')
-        .data(months, d => format(d, 'YYYY-MM'));
+      let selection = svg.selectAll('.month')
+        .data(months, d => monthString(d));
       // exiting
       selection.exit()
         .remove();
@@ -80,38 +78,24 @@
         .attr('x', getX('2000-12-31T00:00:00Z') + 100)
         .attr('y', 4)
         .attr('text-anchor', 'end');
-      entering.each(function(d) {
-        let group = d3.select(this);
-        let firstDay = startOfMonth(d);
-        let lastDayOfMonth = endOfMonth(d);
-        while (isSameMonth(firstDay, d)) {
-          let lastDay = endOfWeek(firstDay, {weekStartsOn});
-          if (lastDay > lastDayOfMonth) lastDay = lastDayOfMonth;
-          group.append('line')
-            .attr('x1', getX(firstDay) - 12)
-            .attr('x2', getX(lastDay) + 12)
-            .attr('y1', 0)
-            .attr('y2', 0);
-          firstDay = addDays(lastDay, 1);
-        }
-      });
+      entering.selectAll('.week').data(month => getWeeks(month)).enter()
+        .append('line')
+        .attr('class', 'week')
+        .attr('x1', d => getX(d.firstDay) - 12)
+        .attr('x2', d => getX(d.lastDay) + 12)
+        .attr('y1', 0)
+        .attr('y2', 0);
     }
 
     function renderActivities() {
-      let selection = svg.select('.activity-layer').selectAll('.activity')
-        .data(activities, d => d.id);
-      // exiting
+      let selection = svg.selectAll('.month').selectAll('.activity')
+        .data(month => getActivitiesForMonth(month), activity => activity.id);
       selection.exit()
         .remove();
-      // updating
-      selection
-        .classed('selected', d => d.id === selected && selected.id)
-        .attr('transform', d => `translate(${getX(d.start_time)},${getY(d.start_time)})`);
-      // entering
       let entering = selection.enter()
         .append('g')
         .attr('class', 'activity')
-        .attr('transform', d => `translate(${getX(d.start_time)},${getY(d.start_time)})`);
+        .attr('transform', d => `translate(${getX(d.start_time)},0)`);
       entering
         .append('circle')
         .attr('class', d => d.type)
@@ -128,6 +112,23 @@
         .text(d => getDistanceFormatted(d.distance));
     }
 
+    function getActivitiesForMonth(month) {
+      return activitiesByMonth[monthString(month)] || [];
+    }
+
+    function getWeeks(month) {
+      let weeks = [];
+      let firstDay = startOfMonth(month);
+      let lastDayOfMonth = endOfMonth(month);
+      while (isSameMonth(firstDay, month)) {
+        let lastDay = endOfWeek(firstDay, {weekStartsOn});
+        if (lastDay > lastDayOfMonth) lastDay = lastDayOfMonth;
+        weeks.push({firstDay, lastDay});
+        firstDay = addDays(lastDay, 1);
+      }
+      return weeks;
+    }
+
     function renderTotals() {
       svg.selectAll('.month-total-distance')
         .text(d => getTotalDistanceOfMonthFormatted(d));
@@ -138,27 +139,28 @@
     }
 
     function getTotalDistanceOfMonthFormatted(date) {
-      let totalDistance = totalDistancePerMonth[format(date, 'YYYY-MM')];
+      let activities = activitiesByMonth[monthString(date)] || [];
+      let totalDistance = activities.reduce((p, v) => p + v.distance / 1000, 0);
       return totalDistance ? Math.floor(totalDistance) + ' km' : '';
     }
 
     function renderCursor() {
-      let selection = svg.select('.cursor-layer').selectAll('.cursor')
-        .data(selected ? [selected] : [], d => d.id);
+      let selectedMonth = selected ? startOfMonth(selected.start_time) : null;
+      let selection = svg.selectAll('.month').selectAll('.cursor')
+        .data(month => isSameMonth(month, selectedMonth) ? [selected] : [], d => d.id);
       // exiting
       selection.exit()
         .remove();
       // updating
       selection
-        .attr('cx', d => getX(d.start_time))
-        .attr('cy', d => getY(d.start_time));
+        .attr('cx', d => getX(d.start_time));
       // entering
       selection.enter()
         .append('circle')
         .attr('class', 'cursor')
         .attr('r', 11)
         .attr('cx', d => getX(d.start_time))
-        .attr('cy', d => getY(d.start_time));
+        .attr('cy', 0);
     }
 
     function showMonth(month) {
@@ -187,6 +189,10 @@
       return yMargin + 20 + diff * 55;
     }
 
+  }
+
+  function monthString(date) {
+    return format(date, 'YYYY-MM');
   }
 
 })();
