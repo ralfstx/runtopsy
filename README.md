@@ -2,15 +2,17 @@
 
 A running app that shows your running activities on a calendar strip and on the map.
 
+![Runtopsy Screenshot](https://user-images.githubusercontent.com/255637/57014668-68ccb200-6c11-11e9-903f-85a1a2cbeb70.png)
+
 ## [run‧top‧sy]
 
 After-the-fact examination of your running activities.
 
 ## Setup
 
-A config JSON file is expected at `$HOME/.running/config.json` file in the user home directory.
+A config JSON file is expected at `$HOME/.running/config.json` in the user home directory.
 
-```json
+```jsonc
 {
   "importers": {
     "file": {

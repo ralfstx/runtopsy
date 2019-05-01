@@ -27,7 +27,7 @@ body {
   cursor: pointer;
 }
 #calendar .activity circle.running {
-  fill: #55aa77;
+  fill: steelblue;
 }
 #calendar .activity text {
   fill: #555;
