@@ -11,18 +11,17 @@ function createImporter(model) {
   let stravaImporter = createStravaImporter(model);
 
   return {
-    importFiles
+    importNewActivities
   };
 
-  async function importFiles(callback) {
-
+  async function importNewActivities() {
     let config = await model.getConfig();
     let importers = config.importers || {};
     if ('file' in importers && importers.file.enabled) {
-      fileImporter.importFiles(callback);
+      await fileImporter.importNewActivities();
     }
     if ('strava' in importers && importers.strava.enabled) {
-      stravaImporter.importFiles(callback);
+      await stravaImporter.importNewActivities();
     }
   }
 

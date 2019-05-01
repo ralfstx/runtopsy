@@ -1,5 +1,6 @@
 const { join } = require('path');
 const { homedir } = require('os');
+const { BrowserWindow } = require('electron');
 const { ensureDir, readdir, readJson, stat, writeJson } = require('fs-extra');
 const { readJsonSafe } = require('./files');
 
@@ -13,6 +14,8 @@ function createModel() {
   let $dbDir = ensureDbDir();
   let $config = readConfig();
   let $activities = loadActivities();
+  // TODO extract to updater module
+  let updating = false;
 
   return {
     getConfigDir,
@@ -38,6 +41,19 @@ function createModel() {
     await storeActivityToFile(activity);
     let activities = await $activities;
     activities[activity.id] = activity;
+    scheduleUpdate();
+  }
+
+  function scheduleUpdate() {
+    if (updating) return;
+    updating = true;
+    setTimeout(() => doUpdate().catch(console.error), 1000);
+  }
+
+  async function doUpdate() {
+    updating = false;
+    let activities = await $activities;
+    BrowserWindow.getAllWindows().forEach(win => win.webContents.send('activities', Object.values(activities)));
   }
 
   async function storeActivityToFile(activity) {

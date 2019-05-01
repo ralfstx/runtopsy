@@ -10,10 +10,10 @@ module.exports = {
 function createImporter(model) {
 
   return {
-    importFiles
+    importNewActivities
   };
 
-  async function importFiles(callback) {
+  async function importNewActivities() {
     let config = await model.getConfig();
     let configDir = await model.getConfigDir();
     let filesDir = join(configDir, 'files');
@@ -73,7 +73,7 @@ function createImporter(model) {
 
     async function processSession(session) {
       let activity = extractActivity(session);
-      callback(activity);
+      await model.addActivity(activity);
     }
 
   }

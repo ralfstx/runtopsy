@@ -6,6 +6,7 @@ const { createImporter } = require('./importer');
 
 let mainWindow;
 let model = createModel();
+let importer = createImporter(model);
 
 ipcMain.on('get-config', (event) => {
   model.getConfig().then(config => event.sender.send('config', config)).catch(console.error);
@@ -16,7 +17,7 @@ ipcMain.on('get-activities', (event) => {
   }).catch(console.error);
 });
 ipcMain.on('import', () => {
-  startImport().catch(console.error);
+  importer.importNewActivities().catch(console.error);
 });
 
 app.on('ready', () => {
@@ -33,14 +34,6 @@ app.on('activate', () => {
     createWindow();
   }
 });
-
-async function startImport() {
-  let importer = createImporter(model);
-  await importer.importFiles(async activity => {
-    await model.addActivity(activity);
-    BrowserWindow.getAllWindows().forEach(win => win.webContents.send('activities', [activity]));
-  });
-}
 
 function createWindow () {
   mainWindow = new BrowserWindow({

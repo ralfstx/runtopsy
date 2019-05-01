@@ -15,10 +15,10 @@ function createImporter(model) {
   let access_token;
 
   return {
-    importFiles
+    importNewActivities
   };
 
-  async function importFiles(callback) {
+  async function importNewActivities() {
 
     let config = await model.getConfig();
     let metadata = await readMetadata();
@@ -105,7 +105,7 @@ function createImporter(model) {
         let prefixedId = `strava_${id}`;
         if (!allDbIds.includes(prefixedId)) {
           let activity = await readActivity(id);
-          await callback(extractActivity(activity));
+          await model.addActivity(extractActivity(activity));
         }
       }
     }
@@ -131,6 +131,7 @@ function createImporter(model) {
       for (let activity of activities) {
         let file = join(storageDir, `${activity.id}.json`);
         await writeJson(file, activity);
+        await model.addActivity(extractActivity(activity));
       }
       await updateLastStartTime(activities);
     }
