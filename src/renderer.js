@@ -95,17 +95,29 @@
 
   function getNextMonthActivity() {
     if (!currentActivity) return;
+    let targetDate = addMonths(currentActivity.start_time, 1);
     let monthEnd = endOfMonth(currentActivity.start_time);
+    let nextMonthEnd = endOfMonth(targetDate);
     let candidates = orderedActivities.filter(a => isAfter(a.start_time, monthEnd));
-    let index = closestIndexTo(addMonths(currentActivity.start_time, 1), candidates.map(a => a.start_time));
+    // reduce candidates to next month if it's not empty
+    if (candidates.some(a => !isAfter(a.start_time, nextMonthEnd))) {
+      candidates = candidates.filter(a => !isAfter(a.start_time, nextMonthEnd));
+    }
+    let index = closestIndexTo(targetDate, candidates.map(a => a.start_time));
     return candidates[index] || null;
   }
 
   function getPrevMonthActivity() {
     if (!currentActivity) return;
+    let targetDate = subMonths(currentActivity.start_time, 1);
     let monthStart = startOfMonth(currentActivity.start_time);
+    let prevMonthStart = startOfMonth(targetDate);
     let candidates = orderedActivities.filter(a => isBefore(a.start_time, monthStart));
-    let index = closestIndexTo(subMonths(currentActivity.start_time, 1), candidates.map(a => a.start_time));
+    // reduce candidates to previous month if it's not empty
+    if (candidates.some(a => !isBefore(a.start_time, prevMonthStart))) {
+      candidates = candidates.filter(a => !isBefore(a.start_time, prevMonthStart));
+    }
+    let index = closestIndexTo(targetDate, candidates.map(a => a.start_time));
     return candidates[index] || null;
   }
 
