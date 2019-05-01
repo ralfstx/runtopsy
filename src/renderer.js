@@ -59,6 +59,9 @@
     orderedActivities = Object.values(activities);
     orderedActivities.sort((a, b) => Date.parse(a.start_time) - Date.parse(b.start_time));
     calendar.setActivities(orderedActivities);
+    if (!currentActivity) {
+      selectActivity(getLastActivity());
+    }
   }
 
   async function updateRecords(activityRecords) {
