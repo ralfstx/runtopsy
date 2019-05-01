@@ -22,10 +22,12 @@ function createImporter(model) {
 
     let config = await model.getConfig();
     let metadata = await readMetadata();
+    await updateMissingActivitiesInDb();
+    await updateMissingActivityRecordsInDb();
     await ensureAccessToken();
     let authHeader = {Authorization: `Bearer ${access_token}`};
-    await requestActivities();
-    await updateDb();
+    await downloadNewActivities();
+    await downloadMissingActivityStreams();
 
     async function ensureAccessToken() {
       if (!access_token) {
@@ -97,20 +99,34 @@ function createImporter(model) {
       return await postJson('https://www.strava.com/oauth/token', data);
     }
 
-    async function updateDb() {
+    async function updateMissingActivitiesInDb() {
       let activities = await model.getActivities();
-      let allDbIds = activities.map(activity => activity.id);
-      let stravaIds = await readIds();
+      let activityIdsInDb = activities.map(activity => activity.id);
+      let activitiesDir = await getActivitiesDir();
+      let stravaIds = await readIds(activitiesDir);
       for (let id of stravaIds) {
         let dbId = getDbId(id);
-        if (!allDbIds.includes(dbId)) {
+        if (!activityIdsInDb.includes(dbId)) {
           let activity = await readActivity(id);
           await model.addActivity(extractActivity(activity));
         }
       }
     }
 
-    async function requestActivities() {
+    async function updateMissingActivityRecordsInDb() {
+      let streamIdsInDb = await model.getActivityIdsWithRecords();
+      let streamsDir = await getStreamsDir();
+      let streamIds = await readIds(streamsDir);
+      for (let id of streamIds) {
+        let dbId = getDbId(id);
+        if (!streamIdsInDb.includes(dbId)) {
+          let stream = await readStream(id);
+          await model.addActivityRecords(dbId, extractRecords(stream));
+        }
+      }
+    }
+
+    async function downloadNewActivities() {
       let page = 1;
       let per_page = 100;
       let after = metadata.last_activity_start_time;
@@ -136,9 +152,33 @@ function createImporter(model) {
       await updateLastStartTime(activities);
     }
 
-    async function readIds() {
+    async function downloadMissingActivityStreams() {
       let activitiesDir = await getActivitiesDir();
-      let files = await readdir(activitiesDir);
+      let activityIds = await readIds(activitiesDir);
+      let streamsDir = await getStreamsDir();
+      let streamIds = await readIds(streamsDir);
+      let missingIds = activityIds.filter(id => !streamIds.includes(id));
+      if (missingIds.length) {
+        console.log(`Found ${pluralize(missingIds.length, 'activity', 'activities')} with missing streams`);
+        for (let [index, id] of missingIds.entries()) {
+          console.log(`downloading activity steam ${index + 1} of ${missingIds.length}`);
+          let stream = await downloadActivityStream(id);
+          let streamFile = join(streamsDir, `${id}.json`);
+          await writeJson(streamFile, stream);
+          let dbId = getDbId(id);
+          await model.addActivityRecords(dbId, extractRecords(stream));
+        }
+      }
+    }
+
+    async function downloadActivityStream(activityId) {
+      // TODO: include heartrate, cadence, etc, see http://developers.strava.com/docs/reference/#api-models-StreamSet
+      let query = buildQuery({key_by_type: true, keys: ['time', 'distance', 'latlng', 'velocity_smooth']});
+      return await getJson(`${apiBaseUrl}/activities/${activityId}/streams/?${query}`, authHeader);
+    }
+
+    async function readIds(dir) {
+      let files = await readdir(dir);
       return files.filter(name => name.endsWith('.json')).map(name => name.replace(/\.json$/, ''));
     }
 
@@ -173,11 +213,24 @@ function createImporter(model) {
     return await readJsonSafe(activityFile, {});
   }
 
+  async function readStream(id) {
+    let streamsDir = await getStreamsDir();
+    let streamFile = join(streamsDir, `${id}.json`);
+    return await readJsonSafe(streamFile, {});
+  }
+
   async function getActivitiesDir() {
     let storageDir = await getStorageDir();
     let activitiesDir = join(storageDir, 'activities');
     await ensureDir(activitiesDir);
     return activitiesDir;
+  }
+
+  async function getStreamsDir() {
+    let storageDir = await getStorageDir();
+    let streamsDir = join(storageDir, 'streams');
+    await ensureDir(streamsDir);
+    return streamsDir;
   }
 
   async function getStorageDir() {
@@ -197,8 +250,16 @@ function createImporter(model) {
       distance: activity.distance,
       moving_time: activity.moving_time,
       avg_speed: activity.average_speed,
-      track_polyline: activity.map && activity.map.summary_polyline,
-      records: []
+      track_polyline: activity.map && activity.map.summary_polyline
+    };
+  }
+
+  function extractRecords(stream) {
+    return {
+      time: stream.time.data,
+      distance: stream.distance.data,
+      position: stream.latlng.data,
+      speed: stream.velocity_smooth.data
     };
   }
 
@@ -213,6 +274,10 @@ function createImporter(model) {
     default:
       return 'other';
     }
+  }
+
+  function pluralize(n, singular, plural) {
+    return n === 1 ? `${n} ${singular}` : `${n} ${plural}`;
   }
 
 }

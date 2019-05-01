@@ -23,6 +23,9 @@
     ipc.on('activities', (event, activities) => {
       addActivities(activities);
     });
+    ipc.on('records', (event, activityRecords) => {
+      updateRecords(activityRecords);
+    });
     ipc.on('goto-first-activity', () => selectActivity(getFirstActivity()));
     ipc.on('goto-last-activity', () => selectActivity(getLastActivity()));
     ipc.on('goto-next-activity', () => selectActivity(getNextActivity() || getLastActivity()));
@@ -56,6 +59,14 @@
     orderedActivities = Object.values(activities);
     orderedActivities.sort((a, b) => Date.parse(a.start_time) - Date.parse(b.start_time));
     calendar.setActivities(orderedActivities);
+  }
+
+  async function updateRecords(activityRecords) {
+    if (activityRecords.activityId === currentActivity.id) {
+      let activity = Object.assign({}, currentActivity, {records: activityRecords.records});
+      updateMap(activity);
+      updateChart(activity);
+    }
   }
 
   function getNextActivity() {
@@ -109,6 +120,7 @@
     updateTitle(activity);
     updateResults(activity);
     calendar.setActive(activity);
+    ipc.send('get-records', activity.id);
   }
 
   function showDetails() {

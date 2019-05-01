@@ -75,46 +75,53 @@ function createImporter(model) {
 
     async function processSession(session) {
       let activity = extractActivity(session);
+      let records = extractRecords(session);
       await model.addActivity(activity);
+      await model.addActivityRecords(activity.id, records);
     }
-
   }
 
   function extractActivity(session) {
-    let records = session.laps
-      .map(lap => lap.records)
-      .reduce((a, b) => a.concat(b), [])
-      .map(record => extractRecord(record));
-    let activity = {
+    return {
       id: getDbId(session),
       type: session.sport,
       start_time: session.start_time,
       end_time: session.timestamp,
       distance: session.total_distance,
       moving_time: session.total_timer_time,
-      avg_speed: session.avg_speed,
-      records
+      avg_speed: session.avg_speed
     };
-    return activity;
+  }
+
+  function extractRecords(session) {
+    let records = session.laps
+      .map(lap => lap.records)
+      .reduce((a, b) => a.concat(b), [])
+      .map(record => extractRecord(record));
+    return {
+      time: records.map(record => record.time),
+      distance: records.map(record => record.distance),
+      speed: records.map(record => record.speed),
+      position: records.map(record => record.position)
+    };
+  }
+
+  function extractRecord(record) {
+    // some records have no position
+    let position = ('position_lat' in record && 'position_long' in record)
+      ? [record.position_lat, record.position_long] : null;
+    return {
+      time: record.elapsed_time,
+      distance: record.distance,
+      speed: record.speed,
+      position
+    };
   }
 
   function getDbId(importDir, session) {
     let time = Date.parse(session.start_time).toString();
     let dirHash = createHash('sha1').update('test').digest('hex').substr(0, 8);
     return `file_${dirHash}_${time}`;
-  }
-
-  function extractRecord(record) {
-    let result = {
-      time: record.elapsed_time,
-      distance: record.distance,
-      speed: record.speed
-    };
-    // some records have no position
-    if ('position_lat' in record && 'position_long' in record) {
-      result.position = [record.position_lat, record.position_long];
-    }
-    return result;
   }
 
   async function findFitFiles(dir) {

@@ -9,12 +9,19 @@ let model = createModel();
 let importer = createImporter(model);
 
 ipcMain.on('get-config', (event) => {
-  model.getConfig().then(config => event.sender.send('config', config)).catch(console.error);
+  model.getConfig()
+    .then(config => event.sender.send('config', config))
+    .catch(console.error);
 });
 ipcMain.on('get-activities', (event) => {
-  model.getActivities().then(activities => {
-    event.sender.send('activities', activities);
-  }).catch(console.error);
+  model.getActivities()
+    .then(activities => event.sender.send('activities', activities))
+    .catch(console.error);
+});
+ipcMain.on('get-records', (event, activityId) => {
+  model.getActivityRecords(activityId)
+    .then(activityRecords => event.sender.send('records', activityRecords))
+    .catch(console.error);
 });
 ipcMain.on('import', () => {
   importer.importNewActivities().catch(console.error);
