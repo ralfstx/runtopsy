@@ -74,16 +74,17 @@ function createImporter(model) {
     }
 
     async function processSession(session) {
-      let activity = extractActivity(session);
+      let dbId = getDbId(importDir, session);
+      let activity = extractActivity(dbId, session);
       let records = extractRecords(session);
       await model.addActivity(activity);
-      await model.addActivityRecords(activity.id, records);
+      await model.addActivityRecords(dbId, records);
     }
   }
 
-  function extractActivity(session) {
+  function extractActivity(id, session) {
     return {
-      id: getDbId(session),
+      id,
       type: session.sport,
       start_time: session.start_time,
       end_time: session.timestamp,
