@@ -53,8 +53,8 @@
     for (let activity of activitiesToAdd) {
       activities[activity.id] = activity;
     }
-    let orderedIds = Object.keys(activities).sort((a, b) => parseInt(a) - parseInt(b));
-    orderedActivities = orderedIds.map(id => activities[id]);
+    orderedActivities = Object.values(activities);
+    orderedActivities.sort((a, b) => Date.parse(a.start_time) - Date.parse(b.start_time));
     calendar.setActivities(orderedActivities);
   }
 
