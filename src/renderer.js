@@ -1,7 +1,7 @@
 (function() {
 
   const { humanizeDuration, ipc } = window;
-  const { addMonths, closestIndexTo, endOfMonth, format, isAfter, isBefore, subMonths } = window.dateFns;
+  const { addMonths, closestIndexTo, endOfMonth, format, isAfter, isBefore, startOfMonth, subMonths } = window.dateFns;
   const { CalendarView, ChartView, MapView } = window.runtopsy;
 
   let activities = {};
@@ -92,7 +92,7 @@
 
   function getPrevMonthActivity() {
     if (!currentActivity) return;
-    let monthStart = endOfMonth(currentActivity.start_time);
+    let monthStart = startOfMonth(currentActivity.start_time);
     let candidates = orderedActivities.filter(a => isBefore(a.start_time, monthStart));
     let index = closestIndexTo(subMonths(currentActivity.start_time, 1), candidates.map(a => a.start_time));
     return candidates[index] || null;
