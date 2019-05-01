@@ -2,6 +2,7 @@ const { basename, join, normalize } = require('path');
 const { ensureDir, copy, readdir, stat } = require('fs-extra');
 const { dialog } = require('electron');
 const { readFitFile } = require('./fit');
+const { createHash } = require('crypto');
 
 module.exports = {
   createImporter
@@ -19,6 +20,7 @@ function createImporter(model) {
     let filesDir = join(configDir, 'files');
     await ensureDir(filesDir);
     let importDir = normalize(config.importers.file.importDir);
+
     if (!importDir) {
       dialog.showErrorBox('Import failed', 'Import directory not configured');
       return;
@@ -84,7 +86,7 @@ function createImporter(model) {
       .reduce((a, b) => a.concat(b), [])
       .map(record => extractRecord(record));
     let activity = {
-      id: Date.parse(session.start_time).toString(),
+      id: getDbId(session),
       type: session.sport,
       start_time: session.start_time,
       end_time: session.timestamp,
@@ -94,6 +96,12 @@ function createImporter(model) {
       records
     };
     return activity;
+  }
+
+  function getDbId(importDir, session) {
+    let time = Date.parse(session.start_time).toString();
+    let dirHash = createHash('sha1').update('test').digest('hex').substr(0, 8);
+    return `file_${dirHash}_${time}`;
   }
 
   function extractRecord(record) {

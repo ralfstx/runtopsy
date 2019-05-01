@@ -102,8 +102,8 @@ function createImporter(model) {
       let allDbIds = activities.map(activity => activity.id);
       let stravaIds = await readIds();
       for (let id of stravaIds) {
-        let prefixedId = `strava_${id}`;
-        if (!allDbIds.includes(prefixedId)) {
+        let dbId = getDbId(id);
+        if (!allDbIds.includes(dbId)) {
           let activity = await readActivity(id);
           await model.addActivity(extractActivity(activity));
         }
@@ -190,7 +190,7 @@ function createImporter(model) {
   function extractActivity(activity) {
     let startTime = Date.parse(activity.start_date_local);
     return {
-      id: startTime.toString(),
+      id: getDbId(activity.id),
       type: mapType(activity.type),
       start_time: new Date(startTime).toISOString(),
       end_time: new Date(startTime + activity.elapsed_time * 1000).toISOString(),
@@ -200,6 +200,10 @@ function createImporter(model) {
       track_polyline: activity.map && activity.map.summary_polyline,
       records: []
     };
+  }
+
+  function getDbId(id) {
+    return `strava_${id}`;
   }
 
   function mapType(type) {
