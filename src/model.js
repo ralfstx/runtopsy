@@ -1,8 +1,8 @@
 const { join } = require('path');
 const { homedir } = require('os');
 const { throttle } = require('throttle-debounce');
-const { BrowserWindow } = require('electron');
 const { ensureDir, readdir, readJson, stat, writeJson } = require('fs-extra');
+const { notifyRenderer } = require('./broadcast');
 const { readJsonSafe } = require('./files');
 
 module.exports = {
@@ -46,7 +46,7 @@ function createModel() {
 
   async function updateRenderer() {
     let activities = await $activities;
-    BrowserWindow.getAllWindows().forEach(win => win.webContents.send('activities', Object.values(activities)));
+    notifyRenderer('activities', Object.values(activities));
   }
 
   async function storeActivityToFile(activity) {

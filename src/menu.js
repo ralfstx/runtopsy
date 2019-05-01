@@ -1,4 +1,5 @@
-const { BrowserWindow, ipcMain, Menu } = require('electron');
+const { Menu } = require('electron');
+const { notifyMain, notifyRenderer } = require('./broadcast');
 
 module.exports = {
   createMenu
@@ -78,12 +79,4 @@ const menuTemplate = [
 
 function createMenu() {
   Menu.setApplicationMenu(Menu.buildFromTemplate(menuTemplate));
-}
-
-function notifyRenderer(topic, ...args) {
-  BrowserWindow.getAllWindows().forEach(win => win.webContents.send(topic, ...args));
-}
-
-function notifyMain(topic, ...args) {
-  ipcMain.emit(topic, ...args);
 }
