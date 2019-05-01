@@ -7,24 +7,30 @@
     <link rel="stylesheet" type="text/css" href="style.css" />
   </head>
   <body>
-    <div id="calendar"></div>
-    <div id="details-title" class="details hidden"></div>
-    <div id="map" class="details hidden"></div>
-    <div id="info" class="details hidden">
-      <table class="results">
-        <tr>
-          <th><div>Distance</div></th>
-          <th><div>Average pace</div></th>
-          <th><div>Moving time</div></th>
-        </tr>
-        <tr>
-          <td><div id="value-distance"></div></td>
-          <td><div id="value-avg-pace"></div></td>
-          <td><div id="value-mov-time"></div></td>
-        </tr>
-      </table>
+    <div id="map-container">
+      <div id="map" class="details hidden"></div>
     </div>
-    <div id="chart" class="details hidden"></div>
+    <div id="top-container">
+      <div id="calendar"></div>
+      <div id="details-title" class="details hidden"></div>
+    </div>
+    <div id="bottom-container">
+      <div id="info" class="details hidden">
+        <table class="results">
+          <tr>
+            <th><div>Distance</div></th>
+            <th><div>Average pace</div></th>
+            <th><div>Moving time</div></th>
+          </tr>
+          <tr>
+            <td><div id="value-distance"></div></td>
+            <td><div id="value-avg-pace"></div></td>
+            <td><div id="value-mov-time"></div></td>
+          </tr>
+        </table>
+      </div>
+      <div id="chart" class="details hidden"></div>
+    </div>
     <script src="../node_modules/leaflet/dist/leaflet.js"></script>
     <script src="../node_modules/polyline-encoded/Polyline.encoded.js"></script>
     <script src="../node_modules/d3/dist/d3.min.js"></script>
