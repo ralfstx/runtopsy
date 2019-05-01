@@ -1,5 +1,6 @@
 const { join } = require('path');
 const { homedir } = require('os');
+const { throttle } = require('throttle-debounce');
 const { BrowserWindow } = require('electron');
 const { ensureDir, readdir, readJson, stat, writeJson } = require('fs-extra');
 const { readJsonSafe } = require('./files');
@@ -10,12 +11,11 @@ module.exports = {
 
 function createModel() {
 
-  let $configDir = ensureConfigDir();
-  let $dbDir = ensureDbDir();
-  let $config = readConfig();
-  let $activities = loadActivities();
-  // TODO extract to updater module
-  let updating = false;
+  const $configDir = ensureConfigDir();
+  const $dbDir = ensureDbDir();
+  const $config = readConfig();
+  const $activities = loadActivities();
+  const updateRendererThrottled = throttle(250, () => updateRenderer().catch(console.error));
 
   return {
     getConfigDir,
@@ -41,17 +41,10 @@ function createModel() {
     await storeActivityToFile(activity);
     let activities = await $activities;
     activities[activity.id] = activity;
-    scheduleUpdate();
+    updateRendererThrottled();
   }
 
-  function scheduleUpdate() {
-    if (updating) return;
-    updating = true;
-    setTimeout(() => doUpdate().catch(console.error), 1000);
-  }
-
-  async function doUpdate() {
-    updating = false;
+  async function updateRenderer() {
     let activities = await $activities;
     BrowserWindow.getAllWindows().forEach(win => win.webContents.send('activities', Object.values(activities)));
   }
