@@ -30,6 +30,7 @@ ipcMain.on('import', () => {
 app.on('ready', () => {
   createWindow();
   createMenu();
+  importer.importNewActivities().catch(console.error);
 });
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
