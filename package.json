@@ -19,7 +19,7 @@
     "typeface-open-sans": "0.0.75"
   },
   "devDependencies": {
-    "electron": "^8.0.1",
+    "electron": "^8.2.4",
     "eslint": "^5.16.0"
   }
 }
